@@ -307,7 +307,7 @@ html {
     font-size: 18px;
 }
 
-.main .news-posts .posts  {
+.main .news-posts .posts, .comments-page .posts  {
     background-color: rgb(255, 255, 255);
     margin: 0px 30px 30px;
     height: fit-content;
@@ -342,3 +342,28 @@ html {
     background: #e5e7eb;
 }
 /* End of main page styles */
+
+/* Start of Fullpost styles*/
+.comments-page {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 100dvh;
+}
+
+.comments-page .posts {
+    padding: 10px 25px 30px;
+    margin-top: 200px;
+}
+
+.comments-page .posts h3 {
+    margin: 20px 0;
+}
+
+.comments-page .comments-overlay {
+    background-color: #3b3b3b;
+    width: 750px;
+    margin: 20px 0;
+    border-radius: 20px;
+}
+/* End of Fullpost styles*/

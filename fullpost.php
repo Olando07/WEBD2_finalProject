@@ -22,13 +22,25 @@ if((int)$id == 0){
     <title>Winnipeg News</title>
 </head>
 <body>
-    <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
-    <div class="posts">
-        <h3 class="title">
-            <?= $row['title']?>
-        </h3>
-        <p><?= $row['report']?></p>
+    <div class="comments-page">
+        <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
+        <div class="posts">
+            <h3 class="title">
+                <?= $row['title']?>
+            </h3>
+            <p><?= $row['report']?></p>
+        </div>
+        <?php endwhile?>
+        <div class="comments-overlay">
+            <div class="comments-main">
+                <div class="comments-head">
+
+                </div>
+                <div class="comments">
+
+                </div>
+            </div>
+        </div>
     </div>
-    <?php endwhile?>
 </body>
 </html>
