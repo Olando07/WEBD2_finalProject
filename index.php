@@ -13,6 +13,7 @@ if(!empty($selectedCategories)){
     $posts=$db->query('SELECT * FROM posts ORDER BY time_created DESC');
 }       
 
+// Array of categories
 $categories = [
     'Technology',
     'Entertainment',
@@ -53,15 +54,19 @@ $categories = [
                 <div class="category-filters">
                     <h3>Filter by category</h3>
 
+                    <!-- Categories users can select -->
                     <?php foreach($categories as $category):?>
-                    <div class="category">
-                        <input type="checkbox" name="selected_categories[]" value="<?= $category?>" id="<?= $category?>" <?= in_array($category, $selectedCategories) ? 'checked' : '' ?>>
-                        <label for="<?= $category?>"><?= $category?></label>
-                    </div>
+                        <!-- Individual category checkbox container -->
+                        <div class="category">
+                            <input type="checkbox" name="selected_categories[]" value="<?= $category?>" id="<?= $category?>" <?= in_array($category, $selectedCategories) ? 'checked' : '' ?>>
+                            <label for="<?= $category?>"><?= $category?></label>
+                        </div>
                     <?php endforeach ?>
 
                     <div class="form-actions">
+                        <!-- Submit button to apply the filters -->
                         <input type="submit" value="Apply Filters" class="filter-btn">
+                        <!-- Clear button to remove filters -->
                         <input type="submit" value="Clear All" onclick="clearAll()">
                     </div>
                 </div>
@@ -73,30 +78,31 @@ $categories = [
                     <input type="text" placeholder="Search" id="search-bar">
                     <input type="submit" value="Search" id="search-btn">
                 </div>
+                <!-- Link to home page -->
                 <a href="index.php" id="homepage">Home</a>
-                <a href="login.php" id="loginStatus">Logged in</a>
+                <!-- Log out button -->
+                <a href="login.php" id="loginStatus">Log out</a>
             </nav>
         </div>
         <div class="news-posts">
-            
+             <!-- PHP for fetching posts -->
             <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
-             
-                 <!-- TODO: link the search of the database by category -->
+                <!-- Check if the current post has a category assigned -->
                 <?php if($row['category']):?>
-                <div class="posts">
-                    <h3 class="title">
-                        <?= $row['title']?>
-                    </h3>
-
-                    <p><?= $row['report']?></p>
-
-                    <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
-                </div>
+                    <!-- Container div for each individual post -->
+                    <div class="posts">
+                        <h3 class="title">
+                            <?= $row['title']?>
+                        </h3>
+                        <p><?= $row['report']?></p>
+                        <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
+                    </div>
                 <?php endif?>
             <?php endwhile?>
         </div>
     </div>
 
+    <!-- Javascript to handle category checkbox clearing -->
     <script>
         function clearAll(){
             document.querySelectorAll('input[name="selected_categories[]"]').forEach(checkbox => {
@@ -106,6 +112,5 @@ $categories = [
             document.querySelector('form').submit();
         }
     </script>
-
 </body>
 </html>

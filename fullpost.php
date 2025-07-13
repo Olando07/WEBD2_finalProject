@@ -22,6 +22,18 @@ if((int)$id == 0){
     <title>Winnipeg News</title>
 </head>
 <body>
+    <div class='nav-bar'>
+        <nav>
+            <div class="search-div">
+                <input type="text" placeholder="Search" id="search-bar">
+                <input type="submit" value="Search" id="search-btn">
+            </div>
+            <!-- Link to home page -->
+            <a href="index.php" id="homepage">Home</a>
+            <!-- Log out button -->
+            <a href="login.php" id="loginStatus">Log out</a>
+        </nav>
+    </div>
     <div class="comments-page">
         <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
         <div class="posts">
@@ -32,12 +44,15 @@ if((int)$id == 0){
         </div>
         <?php endwhile?>
         <div class="comments-overlay">
-            <div class="comments-main">
+            <div class="comments-heading">
+                <h2>Comments</h2>
+            </div>
+            <div class="comments-main"> 
                 <div class="comments-head">
-
+                    
                 </div>
                 <div class="comments">
-
+                    
                 </div>
             </div>
         </div>

@@ -184,7 +184,7 @@ html {
 /* End of Login/SignUp styles */
 
 /* Start of navbar styles */
-.main .nav-bar nav .search-div input {
+.main .nav-bar nav .search-div input, .nav-bar nav .search-div input {
     color: var(--black);
     margin: 5px 15px;
     border-width: 0;
@@ -192,7 +192,7 @@ html {
     background: transparent;
 } 
 
-.main .nav-bar nav .search-div {
+.main .nav-bar nav .search-div, .nav-bar nav .search-div {
     background: #e5e7eb;
     border-radius: 40px;
     width: 500px;
@@ -202,7 +202,7 @@ html {
     justify-content: space-between;
 }
 
-.main .nav-bar nav .search-div #search-btn {
+.main .nav-bar nav .search-div #search-btn, .nav-bar nav .search-div #search-btn {
     cursor: pointer;
     font-size: 20px;
     margin: 0 15px 0 0;
@@ -210,7 +210,7 @@ html {
     padding: 0 6px;
 }
 
-.main .nav-bar nav .search-div #search-btn:hover, .main .nav-bar nav a:hover {
+.main .nav-bar nav .search-div #search-btn:hover, .nav-bar nav .search-div #search-btn:hover, .main .nav-bar nav a:hover, .main .nav-bar nav a:hover {
     color: #fff;
     text-shadow: 2px 0px 2px #ff0000, -2px 0px 2px #ff0000, 0px 2px 2px #ff0000, 0px -2px 2px #ff0000;
 }
@@ -219,7 +219,7 @@ html {
     text-decoration: underline;
 }
 
-.main .nav-bar nav .search-div #search-bar {
+.main .nav-bar nav .search-div #search-bar, .nav-bar nav .search-div #search-bar {
     border-radius: 16px;
     font-size: 20px;
     padding: 1px 15px;
@@ -227,11 +227,15 @@ html {
     margin: 0;
 }
 
-.main .nav-bar {
+.main .nav-bar, .nav-bar {
     height: 100px;
     display: flex;
     align-items: center;
     margin: 15px 0 0;
+}
+
+.nav-bar {
+    margin: 15px 0;
 }
 
 .main .nav-bar nav {
@@ -244,7 +248,16 @@ html {
     margin-right: 20px;
 }
 
-.main .nav-bar nav a {
+.nav-bar nav{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.main .nav-bar nav a, .nav-bar nav a {
     padding: 6px;
     color: var(--black);
     border-bottom: #000;
@@ -257,12 +270,19 @@ html {
     margin: 0px 20px;
 }
 
-.main .nav-bar nav #homepage {
-    margin: 0px 10px 0px 30px;
-    margin-right: 200px;
+.nav-bar nav #homepage {
+    margin: 0px 315px 0px 30px;
 }
 
-.main .nav-bar nav #loginStatus {
+.main .nav-bar nav #homepage {
+    margin: 0px 210px 0px 30px;
+}
+
+.nav-bar nav #loginStatus {
+    margin-right: 60px;
+}
+
+.main .nav-bar nav #loginStatus, .nav-bar nav #loginStatus {
     background-color: #dad9d9;
     border: 2px solid #000;
     border-radius: 10px;
@@ -293,12 +313,28 @@ html {
 }
 
 .main .category-list .category {
-    margin: 12px 0 0 10px;
+    margin: 5px 0 0 10px;
 }
 
 .main .category-list .category-filters h3 {
     color: #fff;
-    margin-left: 15px;
+    margin: 35px 0 35px 15px;
+}
+
+.main .category-list .category-filters .form-actions {
+    margin: 40px 0 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.main .category-list .category-filters .form-actions input {
+    margin: 5px 0;
+    font-size: 17px;
+    border-radius: 10px;
+    padding: 2px 0; 
+    width: 140px;
+    place-self: center;
+    cursor: pointer;
 }
 
 .main .category-list .category input {
@@ -321,6 +357,10 @@ html {
     border-radius: 8px;
 }
 
+.comments-page .posts  {
+    margin: 0 0 30px;
+}
+
 .main .news-posts .posts p {
     padding: 0 25px;
     margin: 15px 0;
@@ -338,7 +378,7 @@ html {
     color: var(--main-color);
 }
 
-.main .news-posts .posts a:hover {
+.main .news-posts .posts a:hover, .main .category-list .category-filters .form-actions input:hover {
     color: #fff;
     text-shadow: 2px 0px 2px #ff0000, -2px 0px 2px #ff0000, 0px 2px 2px #ff0000, 0px -2px 2px #ff0000;
 }
@@ -366,9 +406,20 @@ html {
 }
 
 .comments-page .comments-overlay {
-    background-color: #3b3b3b;
+    background-color: #202020;
     width: 750px;
-    margin: 20px 0;
-    border-radius: 20px;
+    margin: 50px 0;
+    border-radius: 10px;
+}
+
+.comments-page .comments-heading h2 {
+    margin: 0px 0px;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #858484;
+    color: #fff;
+    border-radius: 10px;
 }
 /* End of Fullpost styles*/
