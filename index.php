@@ -2,7 +2,17 @@
 
 require('connect.php');
  
-$posts=$db->query('SELECT * FROM posts ORDER BY time_created DESC');
+$selectedCategories = $_GET['selected_categories'] ?? [];
+
+if(!empty($selectedCategories)){
+    $placeholders = str_repeat('?,', count($selectedCategories) - 1) . '?';
+    $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) ORDER BY time_created DESC";
+    $posts=$db->prepare($stmt);
+    $posts->execute($selectedCategories);      
+}else{
+    $posts=$db->query('SELECT * FROM posts ORDER BY time_created DESC');
+}       
+
 $categories = [
     'Technology',
     'Entertainment',
@@ -39,12 +49,23 @@ $categories = [
 <body>
     <div class='main'>
         <div class="category-list">
-            <?php foreach($categories as $category):?>
-            <div class="category">
-                <input type="checkbox" name="<?= $category?>" id="<?= $category?>">
-                <label for="<?= $category?>"><?= $category?></label>
-            </div>
-            <?php endforeach ?>
+            <form method="GET" action="">
+                <div class="category-filters">
+                    <h3>Filter by category</h3>
+
+                    <?php foreach($categories as $category):?>
+                    <div class="category">
+                        <input type="checkbox" name="selected_categories[]" value="<?= $category?>" id="<?= $category?>" <?= in_array($category, $selectedCategories) ? 'checked' : '' ?>>
+                        <label for="<?= $category?>"><?= $category?></label>
+                    </div>
+                    <?php endforeach ?>
+
+                    <div class="form-actions">
+                        <input type="submit" value="Apply Filters" class="filter-btn">
+                        <input type="submit" value="Clear All" onclick="clearAll()">
+                    </div>
+                </div>
+            </form>
         </div>
         <div class='nav-bar'>
             <nav>
@@ -57,6 +78,7 @@ $categories = [
             </nav>
         </div>
         <div class="news-posts">
+            
             <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
              
                  <!-- TODO: link the search of the database by category -->
@@ -74,6 +96,16 @@ $categories = [
             <?php endwhile?>
         </div>
     </div>
+
+    <script>
+        function clearAll(){
+            document.querySelectorAll('input[name="selected_categories[]"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            document.querySelector('form').submit();
+        }
+    </script>
 
 </body>
 </html>

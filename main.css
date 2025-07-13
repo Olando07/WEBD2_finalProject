@@ -286,14 +286,19 @@ html {
     position: fixed;
     left: -2px;
     border-radius: 5px;
-    padding: 40px 10px;
+    padding: 10px 10px;
     background-color: rgba(0, 0, 0, 0.5);
     color: var(--white);
     overflow-y: hidden;
 }
 
 .main .category-list .category {
-    margin: 15px 0 0 10px;
+    margin: 12px 0 0 10px;
+}
+
+.main .category-list .category-filters h3 {
+    color: #fff;
+    margin-left: 15px;
 }
 
 .main .category-list .category input {
