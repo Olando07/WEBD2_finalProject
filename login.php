@@ -1,10 +1,7 @@
 <?php
 
 require('connect.php');
-
-if(session_status() === PHP_SESSION_NONE){
-    session_start();
-}
+include 'sessionHandler.php';
 
 $userNameError = null;
 $passwordError = null;

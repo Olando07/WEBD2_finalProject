@@ -1,8 +1,7 @@
 <?php
 
-if(session_status() === PHP_SESSION_NONE){
-    session_start();
-}
+include 'sessionHandler.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -14,6 +13,8 @@ if(session_status() === PHP_SESSION_NONE){
     <title>Winnipeg News</title>
 </head>
 <body>
-    
+    <div class="main">
+        
+    </div>
 </body>
 </html>

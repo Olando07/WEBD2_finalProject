@@ -1,8 +1,6 @@
 <?php
 
-if(session_status() === PHP_SESSION_NONE){
-    session_start();
-}
+include 'sessionHandler.php';
 
 $posts=$db->prepare("INSERT INTO posts(creater_id, title, time_created, report)VALUES()");
 

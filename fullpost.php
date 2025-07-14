@@ -1,10 +1,7 @@
 <?php
 
 require('connect.php');
-
-if(session_status() === PHP_SESSION_NONE){
-    session_start();
-}
+include 'sessionHandler.php';
 
 $id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT); 
 
