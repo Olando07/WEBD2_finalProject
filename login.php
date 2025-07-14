@@ -1,8 +1,15 @@
 <?php
 
+require('connect.php');
+
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
+
 $userNameError = null;
 $passwordError = null;
 $loggedIn = null;
+$invalidCredentials = null;
 
 if($_POST && !empty($_POST['login'])){
     if(empty($_POST['username'])){
@@ -17,9 +24,22 @@ if($_POST && !empty($_POST['login'])){
         $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
         $password = $_POST['password'];
 
-        $loggedIn = true;
-        $_POST["username"] = '';
-        $_POST["password"] = '';
+        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
+        $stmt->execute([':username'=>$username, ':password'=>$password]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($user){
+            $loggedIn = true;
+
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['logged_in'] = true;
+
+            $_POST["username"] = '';
+            $_POST["password"] = '';
+        }else{
+            $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
+        }
     }
 }
 
@@ -40,7 +60,6 @@ if($_POST && !empty($_POST['login'])){
                 <div class="input-div">
                     <div class="input-fields">
 
-                     <!-- TODO: Check if username along with password is in database -->
                         <label for="username">Username:</label>
                         <input type="text" name="username" id="username" placeholder="Username" value="<?= isset($_POST["username"]) ? htmlspecialchars($_POST["username"]) : '' ?>">
                         <p class="error"><?= $userNameError?></p>
@@ -57,6 +76,8 @@ if($_POST && !empty($_POST['login'])){
                                 <p id="logged-in">Successfully logged in</p>
                                 <a href="index.php" id="index-link">Click here to see news posts</a>
                             </div>
+                        <?php else: ?>
+                                <?= $invalidCredentials ?>
                         <?php endif ?>
                     </div>
                     <div class="input-btns" >

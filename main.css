@@ -88,9 +88,16 @@ html {
 }
 /* End of error warning */
 
+.main-overlay .input form .input-div .input-fields #logged-in, .main-overlay .input form .input-div .input-fields #failed-login {
+    margin-bottom: 5px;
+}
+
 .main-overlay .input form .input-div .input-fields #logged-in {
     color: #30d421;
-    margin-bottom: 5px;
+}
+
+.main-overlay .input form .input-div .input-fields #failed-login {
+    color: #d61a1a;
 }
 
 .main-overlay .input form .input-div .input-fields #index-link {
@@ -318,7 +325,7 @@ html {
 
 .main .category-list .category-filters h3 {
     color: #fff;
-    margin: 35px 0 35px 15px;
+    margin: 35px 0 40px 15px;
 }
 
 .main .category-list .category-filters .form-actions {

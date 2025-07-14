@@ -1,7 +1,23 @@
 <?php
 
 require('connect.php');
- 
+
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
+
+if(isset($_GET['action']) && $_GET['action'] === 'logout'){
+    session_unset();
+    session_destroy();
+    
+    if(isset($_COOKIE[session_name()])){
+        setcookie(session_name(), '', time()-3600, '/');
+    }
+    
+    header('Location: login.php');
+    exit();
+}
+
 $selectedCategories = $_GET['selected_categories'] ?? [];
 
 if(!empty($selectedCategories)){
@@ -81,7 +97,7 @@ $categories = [
                 <!-- Link to home page -->
                 <a href="index.php" id="homepage">Home</a>
                 <!-- Log out button -->
-                <a href="login.php" id="loginStatus">Log out</a>
+                <a href="login.php" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>
             </nav>
         </div>
         <div class="news-posts">
