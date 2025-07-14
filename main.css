@@ -199,7 +199,7 @@ html {
     background: transparent;
 } 
 
-.main .nav-bar nav .search-div, .nav-bar nav .search-div {
+.main .nav-bar nav .search-div, .nav-bar nav .search-div  {
     background: #e5e7eb;
     border-radius: 40px;
     width: 500px;
@@ -230,7 +230,7 @@ html {
     border-radius: 16px;
     font-size: 20px;
     padding: 1px 15px;
-    width: 630px;
+    width: 405px;
     margin: 0;
 }
 

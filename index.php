@@ -4,6 +4,7 @@ require('connect.php');
 include 'sessionHandler.php';
 requireLogin();
 
+// Logout handle
 if(isset($_GET['action']) && $_GET['action'] === 'logout'){
     session_unset();
     session_destroy();
@@ -44,15 +45,16 @@ $stmt = null;
 $selectedCategories = $_GET['selected_categories'] ?? [];
 $userSearch = $_GET['search-bar'] ?? '';
 
+// Handle filter and search functionality
 if(!empty($selectedCategories)){
-    if(isset($_GET['search-btn']) && !empty($_GET['search-bar'])){
+    if(!empty($_GET['search-bar'])){
         // Both category filter and search 
         $placeholders = str_repeat('?,', count($selectedCategories) - 1) . '?';
         $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) AND title LIKE ? ORDER BY time_created DESC";
         $posts=$db->prepare($stmt);
 
         $searchPattern = '%' . $userSearch . '%';
-        $params=array_merge([$placeholders, [$searchPattern]]);
+        $params=array_merge($selectedCategories, [$searchPattern]);
         $posts->execute($params); 
     }else{
         // Category filter only
@@ -64,7 +66,7 @@ if(!empty($selectedCategories)){
 }else{
     if(isset($_GET['search-btn']) && !empty($_GET['search-bar'])){
         // Search only 
-        $stmt=$db->prepare('SELECT  * FROM posts WHERE title LIKE ? ORDER BY time_created DESC');
+        $stmt = $db->prepare('SELECT  * FROM posts WHERE title LIKE ? ORDER BY time_created DESC');
         $searchPattern = '%' . $userSearch . '%';
         $posts = $stmt;
         $posts->execute([$searchPattern]);
@@ -101,19 +103,21 @@ if(!empty($selectedCategories)){
 
                     <div class="form-actions">
                         <!-- Submit button to apply the filters -->
-                        <input type="submit" value="Apply Filters" class="filter-btn">
+                        <input type="submit" value="Apply Filters" class="filter-btn" name="search-btn" onclick="applyFilter()">
                         <!-- Clear button to remove filters -->
                         <input type="submit" value="Clear All" onclick="clearAll()">
                     </div>
                 </div>
-            </form>
         </div>
         <div class='nav-bar'>
-            <nav>
+                <nav>
                 <div class="search-div">
-                    <input type="text" placeholder="Search" id="search-bar">
-                    <input type="submit" value="Search" id="search-btn">
+                    <input type="text" placeholder="Search" value="<?= isset($_GET['search-bar']) ? htmlspecialchars($userSearch) : '' ?>" id="search-bar" name="search-bar">
+                    <input type="submit" value="Search" id="search-btn" name="search-btn">
                 </div>
+                <!-- TODO: make a guess account where users can only view things -->
+            </form>
+
                 <!-- Link to home page -->
                 <a href="index.php" id="homepage">Home</a>
                 <!-- Log out button -->
@@ -128,9 +132,9 @@ if(!empty($selectedCategories)){
                     <!-- Container div for each individual post -->
                     <div class="posts">
                         <h3 class="title">
-                            <?= $row['title']?>
+                            <?= htmlspecialchars($row['title'])?>
                         </h3>
-                        <p><?= $row['report']?></p>
+                        <p><?= htmlspecialchars($row['report'])?></p>
                         <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
                     </div>
                 <?php endif?>
@@ -140,6 +144,20 @@ if(!empty($selectedCategories)){
 
     <!-- Javascript to handle category checkbox clearing -->
     <script>
+        // functionality to apply filter and keep previous input in search bar
+        function applyFilter(){
+            const searchValue = document.getElementById('search-bar');
+
+            let hiddenValue = document.createElement('input');
+            hiddenValue.type = hidden;
+            hiddenValue.name = 'search-btn';
+            hiddenValue.value = searchValue;
+
+            document.querySelector('form').appendChild(hiddenValue);
+            document.querySelector('form').submit();
+        }
+
+
         function clearAll(){
             document.querySelectorAll('input[name="selected_categories[]"]').forEach(checkbox => {
                 checkbox.checked = false;
