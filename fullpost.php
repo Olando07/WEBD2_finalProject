@@ -1,6 +1,7 @@
 <?php
 
 require('connect.php');
+require('header.php');
 include 'sessionHandler.php';
 
 $id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT); 
@@ -22,18 +23,7 @@ if((int)$id == 0){
     <title>Winnipeg News</title>
 </head>
 <body>
-    <div class='nav-bar'>
-        <nav>
-            <div class="search-div">
-                <input type="text" placeholder="Search" id="search-bar">
-                <input type="submit" value="Search" id="search-btn">
-            </div>
-            <!-- Link to home page -->
-            <a href="index.php" id="homepage">Home</a>
-            <!-- Log out button -->
-            <a href="login.php" id="loginStatus">Log out</a>
-        </nav>
-    </div>
+    
     <div class="comments-page">
         <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
         <div class="posts">

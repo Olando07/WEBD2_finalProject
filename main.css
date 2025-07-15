@@ -248,17 +248,17 @@ html {
 .main .nav-bar nav {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     flex-direction: row;
     height: 100%;
     width: 100%;
-    margin-right: 20px;
+    margin-left: 320px;
 }
 
 .nav-bar nav{
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     flex-direction: row;
     height: 100%;
     width: 100%;
@@ -277,16 +277,12 @@ html {
     margin: 0px 20px;
 }
 
-.nav-bar nav #homepage {
-    margin: 0px 315px 0px 30px;
-}
-
 .main .nav-bar nav #homepage {
-    margin: 0px 210px 0px 30px;
+    margin: 0px 40px 0px 30px;
 }
 
 .nav-bar nav #loginStatus {
-    margin-right: 60px;
+    margin-left: 150px;
 }
 
 .main .nav-bar nav #loginStatus, .nav-bar nav #loginStatus {
@@ -378,11 +374,11 @@ html {
 }
 
 .main .news-posts .posts a {
-    width: 100%;
+    width: 60%;
     display: block;
-    padding: 15px 20px;
     font-size: 17px;
     color: var(--main-color);
+    padding: 0px 10px;
 }
 
 .main .news-posts .posts a:hover, .main .category-list .category-filters .form-actions input:hover {
@@ -390,8 +386,21 @@ html {
     text-shadow: 2px 0px 2px #ff0000, -2px 0px 2px #ff0000, 0px 2px 2px #ff0000, 0px -2px 2px #ff0000;
 }
 
-.main .news-posts .posts .title, .main .news-posts .posts a {
+.main .news-posts .posts .title, .main .news-posts .post-bottom {
     background: #e5e7eb;
+}
+
+.main .news-posts .post-bottom {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 22px;
+    font-weight: bold;
+    align-items: center;
+}
+
+.main .news-posts .post-bottom .date {
+    font-size: 15px;
+    margin: 0;
 }
 /* End of main page styles */
 
@@ -430,3 +439,13 @@ html {
     border-radius: 10px;
 }
 /* End of Fullpost styles*/
+
+/* Styles for create page*/
+.noCreationAccess {
+    color: #ff3535;
+    font-size: 22px;
+    text-align: center;
+    place-self: center;
+    margin: 200px 0;
+}
+/* */

@@ -50,7 +50,7 @@ if(!empty($selectedCategories)){
     if(!empty($_GET['search-bar'])){
         // Both category filter and search 
         $placeholders = str_repeat('?,', count($selectedCategories) - 1) . '?';
-        $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) AND title LIKE ? ORDER BY time_created DESC";
+        $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) AND title LIKE ? ORDER BY time_created, title, subtitle DESC";
         $posts=$db->prepare($stmt);
 
         $searchPattern = '%' . $userSearch . '%';
@@ -59,20 +59,20 @@ if(!empty($selectedCategories)){
     }else{
         // Category filter only
         $placeholders = str_repeat('?,', count($selectedCategories) - 1) . '?';
-        $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) ORDER BY time_created DESC";
+        $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) ORDER BY time_created, title, subtitle DESC";
         $posts=$db->prepare($stmt);
         $posts->execute($selectedCategories);      
     }
 }else{
     if(isset($_GET['search-btn']) && !empty($_GET['search-bar'])){
         // Search only 
-        $stmt = $db->prepare('SELECT  * FROM posts WHERE title LIKE ? ORDER BY time_created DESC');
+        $stmt = $db->prepare('SELECT  * FROM posts WHERE title LIKE ? ORDER BY time_created, title, subtitle DESC');
         $searchPattern = '%' . $userSearch . '%';
         $posts = $stmt;
         $posts->execute([$searchPattern]);
     }else{
         // No category filter or search
-        $posts=$db->query('SELECT * FROM posts ORDER BY time_created DESC');
+        $posts=$db->query('SELECT * FROM posts ORDER BY time_created, title, subtitle DESC');
     }
 }   
 
@@ -109,21 +109,10 @@ if(!empty($selectedCategories)){
                     </div>
                 </div>
         </div>
-        <div class='nav-bar'>
-                <nav>
-                <div class="search-div">
-                    <input type="text" placeholder="Search" value="<?= isset($_GET['search-bar']) ? htmlspecialchars($userSearch) : '' ?>" id="search-bar" name="search-bar">
-                    <input type="submit" value="Search" id="search-btn" name="search-btn">
-                </div>
+                <?php include 'header.php'?>
                 <!-- TODO: make a guess account where users can only view things -->
             </form>
 
-                <!-- Link to home page -->
-                <a href="index.php" id="homepage">Home</a>
-                <!-- Log out button -->
-                <a href="login.php" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>
-            </nav>
-        </div>
         <div class="news-posts">
              <!-- PHP for fetching posts -->
             <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
@@ -135,36 +124,14 @@ if(!empty($selectedCategories)){
                             <?= htmlspecialchars($row['title'])?>
                         </h3>
                         <p><?= htmlspecialchars($row['report'])?></p>
-                        <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
+                        <div class="post-bottom">
+                            <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
+                            <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
+                        </div>
                     </div>
                 <?php endif?>
             <?php endwhile?>
         </div>
     </div>
-
-    <!-- Javascript to handle category checkbox clearing -->
-    <script>
-        // functionality to apply filter and keep previous input in search bar
-        function applyFilter(){
-            const searchValue = document.getElementById('search-bar');
-
-            let hiddenValue = document.createElement('input');
-            hiddenValue.type = hidden;
-            hiddenValue.name = 'search-btn';
-            hiddenValue.value = searchValue;
-
-            document.querySelector('form').appendChild(hiddenValue);
-            document.querySelector('form').submit();
-        }
-
-
-        function clearAll(){
-            document.querySelectorAll('input[name="selected_categories[]"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-
-            document.querySelector('form').submit();
-        }
-    </script>
 </body>
 </html>
