@@ -42,8 +42,6 @@ $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
         window.addEventListener('load', function() {
             if (performance.navigation.type === 1) { // 1 = reload
                 document.getElementById('search-bar').value = '';
-                // Also clear the URL if you want
-                // window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
 
