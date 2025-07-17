@@ -351,7 +351,7 @@ html {
     font-size: 18px;
 }
 
-.main .news-posts .posts, .comments-page .posts  {
+.main .news-posts .posts, .comments-page .posts {
     background-color: rgb(255, 255, 255);
     margin: 0px 30px 30px;
     height: fit-content;
@@ -371,6 +371,10 @@ html {
 
 .main .news-posts .posts .title {
     padding: 15px 25px;
+}
+
+.main .news-posts .posts .title .edit-btn {
+    margin-left: -9px;
 }
 
 .main .news-posts .posts a {

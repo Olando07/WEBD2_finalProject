@@ -30,8 +30,6 @@ $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
             <!-- Link to create page -->
             <a href="create.php" id="createpost">Create</a>
 
-            <!-- Link to edit page  -->
-            <a href="edit.php" id="editpost">Edit</a>
             <!-- Log out button -->
             <a href="login.php" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>
         </nav>

@@ -43,11 +43,12 @@ $categories = [
 
 $stmt = null;
 $selectedCategories = $_GET['selected_categories'] ?? [];
-$userSearch = $_GET['search-bar'] ?? '';
+$userSearch = (filter_input(INPUT_GET, 'search-bar', FILTER_SANITIZE_SPECIAL_CHARS)) ?? '';
+$editBtn = null;
 
 // Handle filter and search functionality
 if(!empty($selectedCategories)){
-    if(!empty($_GET['search-bar'])){
+    if($_GET['search-bar']){
         // Both category filter and search 
         $placeholders = str_repeat('?,', count($selectedCategories) - 1) . '?';
         $stmt = "SELECT * FROM posts WHERE category IN ($placeholders) AND title LIKE ? ORDER BY time_created, title, subtitle DESC";
@@ -64,7 +65,7 @@ if(!empty($selectedCategories)){
         $posts->execute($selectedCategories);      
     }
 }else{
-    if(isset($_GET['search-btn']) && !empty($_GET['search-bar'])){
+    if(isset($_GET['search-btn']) && $_GET['search-bar']){
         // Search only 
         $stmt = $db->prepare('SELECT  * FROM posts WHERE title LIKE ? ORDER BY time_created, title, subtitle DESC');
         $searchPattern = '%' . $userSearch . '%';
@@ -113,6 +114,13 @@ if(!empty($selectedCategories)){
                 <!-- TODO: make a guess account where users can only view things -->
             </form>
 
+        <?php 
+            // Check if user is an admin
+            $stmt=$db->prepare("SELECT * FROM users WHERE username = :username");
+            $stmt->execute([':username'=>$_SESSION['username']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        ?>
         <div class="news-posts">
              <!-- PHP for fetching posts -->
             <?php while($row = $posts->fetch(PDO::FETCH_ASSOC)):?>
@@ -122,6 +130,14 @@ if(!empty($selectedCategories)){
                     <div class="posts">
                         <h3 class="title">
                             <?= htmlspecialchars($row['title'])?>
+                            <?php 
+                            
+                                if($user['is_admin'] == 1){
+                                    $editBtn = "<a href='edit.php?id=" . $row['post_id'] . "' class='edit-btn'>Edit post</a>";
+                                }
+
+                            ?>
+                            <?= $editBtn?>
                         </h3>
                         <p><?= htmlspecialchars($row['report'])?></p>
                         <div class="post-bottom">
