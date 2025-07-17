@@ -130,6 +130,8 @@ if(!empty($selectedCategories)){
                     <div class="posts">
                         <h3 class="title">
                             <?= htmlspecialchars($row['title'])?>
+                            <br>
+                            <?= htmlspecialchars($row['subtitle'])?>
                             <?php 
                             
                                 if($user['is_admin'] == 1){

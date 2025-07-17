@@ -22,7 +22,8 @@ html {
 }
 
 /* overlay for index and other pages */
-.main, .main-overlay {
+.main,
+.main-overlay {
     /* background-color: var(--main-color); */
     min-width: 100dvh;
     min-height: 100dvh;
@@ -40,7 +41,7 @@ html {
     min-width: 490px;
     min-height: 400px;
     border-radius: 12px;
-    margin: 100px 0; 
+    margin: 100px 0;
 }
 
 .main-overlay .input form {
@@ -71,7 +72,8 @@ html {
     color: var(--white);
 }
 
-.main-overlay .input form .input-div .input-fields input, .main-overlay .input form .input-div .input-fields textarea {
+.main-overlay .input form .input-div .input-fields input,
+.main-overlay .input form .input-div .input-fields textarea {
     width: 250px;
     padding: 4px;
     font-size: 18px;
@@ -88,7 +90,8 @@ html {
 }
 /* End of error warning */
 
-.main-overlay .input form .input-div .input-fields #logged-in, .main-overlay .input form .input-div .input-fields #failed-login {
+.main-overlay .input form .input-div .input-fields #logged-in,
+.main-overlay .input form .input-div .input-fields #failed-login {
     margin-bottom: 5px;
 }
 
@@ -119,8 +122,8 @@ html {
     margin: 35px 0;
 }
 
-
-.main-overlay .input form .input-div .input-btns input, .main-overlay .input form .input-div .input-btns a {
+.main-overlay .input form .input-div .input-btns input,
+.main-overlay .input form .input-div .input-btns a {
     font-size: 17px;
     border-radius: 14px;
     cursor: pointer;
@@ -138,13 +141,15 @@ html {
     display: flex;
 }
 
-.main-overlay .input form .input-div .input-btns input:hover, .main-overlay .input form .input-div .input-btns a:hover  {
+.main-overlay .input form .input-div .input-btns input:hover,
+.main-overlay .input form .input-div .input-btns a:hover {
     border-color: #2177d8;
     color: #2177d8;
 }
 /* End of Login/SignUp buttons */
 
-.main-overlay .input form .input-div select, .main-overlay .input form .input-div select option {
+.main-overlay .input form .input-div select,
+.main-overlay .input form .input-div select option {
     color: var(--black);
     height: 30px;
     width: 250px;
@@ -191,15 +196,17 @@ html {
 /* End of Login/SignUp styles */
 
 /* Start of navbar styles */
-.main .nav-bar nav .search-div input, .nav-bar nav .search-div input {
+.main .nav-bar nav .search-div input,
+.nav-bar nav .search-div input {
     color: var(--black);
     margin: 5px 15px;
     border-width: 0;
     outline: none;
     background: transparent;
-} 
+}
 
-.main .nav-bar nav .search-div, .nav-bar nav .search-div  {
+.main .nav-bar nav .search-div,
+.nav-bar nav .search-div {
     background: #e5e7eb;
     border-radius: 40px;
     width: 500px;
@@ -209,7 +216,8 @@ html {
     justify-content: space-between;
 }
 
-.main .nav-bar nav .search-div #search-btn, .nav-bar nav .search-div #search-btn {
+.main .nav-bar nav .search-div #search-btn,
+.nav-bar nav .search-div #search-btn {
     cursor: pointer;
     font-size: 20px;
     margin: 0 15px 0 0;
@@ -217,7 +225,10 @@ html {
     padding: 0 6px;
 }
 
-.main .nav-bar nav .search-div #search-btn:hover, .nav-bar nav .search-div #search-btn:hover, .main .nav-bar nav a:hover, .main .nav-bar nav a:hover {
+.main .nav-bar nav .search-div #search-btn:hover,
+.nav-bar nav .search-div #search-btn:hover,
+.main .nav-bar nav a:hover,
+.main .nav-bar nav a:hover {
     color: #fff;
     text-shadow: 2px 0px 2px #ff0000, -2px 0px 2px #ff0000, 0px 2px 2px #ff0000, 0px -2px 2px #ff0000;
 }
@@ -226,7 +237,8 @@ html {
     text-decoration: underline;
 }
 
-.main .nav-bar nav .search-div #search-bar, .nav-bar nav .search-div #search-bar {
+.main .nav-bar nav .search-div #search-bar,
+.nav-bar nav .search-div #search-bar {
     border-radius: 16px;
     font-size: 20px;
     padding: 1px 15px;
@@ -234,7 +246,8 @@ html {
     margin: 0;
 }
 
-.main .nav-bar, .nav-bar {
+.main .nav-bar,
+.nav-bar {
     height: 100px;
     display: flex;
     align-items: center;
@@ -255,7 +268,7 @@ html {
     margin-left: 320px;
 }
 
-.nav-bar nav{
+.nav-bar nav {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -264,7 +277,8 @@ html {
     width: 100%;
 }
 
-.main .nav-bar nav a, .nav-bar nav a {
+.main .nav-bar nav a,
+.nav-bar nav a {
     padding: 6px;
     color: var(--black);
     border-bottom: #000;
@@ -285,7 +299,8 @@ html {
     margin-left: 150px;
 }
 
-.main .nav-bar nav #loginStatus, .nav-bar nav #loginStatus {
+.main .nav-bar nav #loginStatus,
+.nav-bar nav #loginStatus {
     background-color: #dad9d9;
     border: 2px solid #000;
     border-radius: 10px;
@@ -334,7 +349,7 @@ html {
     margin: 5px 0;
     font-size: 17px;
     border-radius: 10px;
-    padding: 5px 0; 
+    padding: 5px 0;
     width: 140px;
     place-self: center;
     cursor: pointer;
@@ -346,12 +361,13 @@ html {
     margin: 0 15px 0 5px;
 }
 
-.main .category-list .category label{
+.main .category-list .category label {
     color: #fff;
     font-size: 18px;
 }
 
-.main .news-posts .posts, .comments-page .posts {
+.main .news-posts .posts,
+.comments-page .posts {
     background-color: rgb(255, 255, 255);
     margin: 0px 30px 30px;
     height: fit-content;
@@ -360,7 +376,7 @@ html {
     border-radius: 8px;
 }
 
-.comments-page .posts  {
+.comments-page .posts {
     margin: 0 0 30px;
 }
 
@@ -385,12 +401,14 @@ html {
     padding: 0px 10px;
 }
 
-.main .news-posts .posts a:hover, .main .category-list .category-filters .form-actions input:hover {
+.main .news-posts .posts a:hover,
+.main .category-list .category-filters .form-actions input:hover {
     color: #fff;
     text-shadow: 2px 0px 2px #ff0000, -2px 0px 2px #ff0000, 0px 2px 2px #ff0000, 0px -2px 2px #ff0000;
 }
 
-.main .news-posts .posts .title, .main .news-posts .post-bottom {
+.main .news-posts .posts .title,
+.main .news-posts .post-bottom {
     background: #e5e7eb;
 }
 
@@ -452,4 +470,159 @@ html {
     place-self: center;
     margin: 200px 0;
 }
-/* */
+
+/* Styles for edit page */
+.edit-main {
+    padding: 80px 10px 80px;
+}
+
+.edit-main .edit-form {
+    background-color: #fff;
+    place-self: center;
+    padding: 30px;
+    border-radius: 10px;
+    width: 800px;
+    gap: 30px;
+    box-shadow: 0 10px 8px rgba(0, 0, 0, 0.2), 0px -10px 8px rgba(0, 0, 0, 0.2), -10px 0px 8px rgba(0, 0, 0, 0.2), 10px 0px 8px rgba(0, 0, 0, 0.2);
+}
+
+.edit-main .edit-form h2 {
+    place-self: center;
+}
+
+.edit-main .edit-form,
+.edit-main .edit-form form,
+.edit-main .edit-form form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-main .edit-form form {
+    gap: 20px;
+}
+
+.edit-main .edit-form form .form-group {
+    gap: 10px;
+}
+
+.edit-main .edit-form form .form-group label {
+    font-size: 18px;
+}
+
+.edit-main .edit-form form .form-group input {
+    font-size: 18px;
+    padding: 2px 4px;
+}
+
+.edit-main .edit-form form .form-group select {
+    font-size: 17px;
+    width: 200px;
+    cursor: pointer;
+}
+
+.edit-main .edit-form form .form-group select option {
+    padding: 5px 10px;
+}
+
+.edit-main .edit-form form .form-group textarea {
+    padding: 15px;
+    font-size: 17px;
+}
+
+.edit-main .edit-form form .form-actions {
+    padding: 50px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-main .edit-form form .form-actions input,
+.cancel-btn {
+    padding: 8px 10px;
+    font-size: 17px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 2px 0px 2px #000000, -2px 0px 2px #000000, 0px 2px 2px #000000, 0px -2px 2px #000000;
+    color: #fff;
+}
+
+.edit-main .edit-form form .form-actions .update-btn {
+    background-color: #00ff62;
+}
+
+.edit-main .edit-form form .form-actions .delete-btn {
+    background-color: #dc3545;
+}
+
+.cancel-btn {
+    font-size: 18px;
+    background-color: #009dff;
+    border: 2px solid #000;
+}
+
+.update-btn:hover,
+.delete-btn:hover,
+.cancel-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+}
+
+.edit-main .delete-overlay {
+    display: none;
+}
+
+/* delete overlay styles */
+.delete-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height:100vh;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100%;
+}
+
+.delete-modal {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rbga(0,0,0,0.3);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    z-index: 1001;
+    font-size: 18px;
+}
+
+.modal-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn {
+    padding: 6px 15px ;
+    border: none;
+    border-radius: 5px;
+    border: 2px solid #000;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.btn-danger {
+    background-color: #e74c4c;
+    color: white;
+    text-shadow: 2px 0px 2px #000000, -2px 0px 2px #000000, 0px 2px 2px #000000, 0px -2px 2px #000000
+}
+
+.btn-secondary {
+    background-color: #bdc3c7;
+    color: #fff;
+    text-shadow: 2px 0px 2px #000000, -2px 0px 2px #000000, 0px 2px 2px #000000, 0px -2px 2px #000000
+}
