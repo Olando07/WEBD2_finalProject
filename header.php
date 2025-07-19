@@ -56,7 +56,6 @@ $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
             document.querySelector('form').submit();
         }
 
-
         function clearAll(){
             document.querySelectorAll('input[name="selected_categories[]"]').forEach(checkbox => {
                 checkbox.checked = false;

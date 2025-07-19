@@ -330,13 +330,15 @@ html {
     overflow-y: hidden;
 }
 
-.main .category-list .category {
-    margin: 5px 0 0 10px;
+.main .category-list .category-filters {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .main .category-list .category-filters h3 {
     color: #fff;
-    margin: 35px 0 40px 15px;
+    margin: 45px 0 70px 15px;
 }
 
 .main .category-list .category-filters .form-actions {
@@ -346,7 +348,7 @@ html {
 }
 
 .main .category-list .category-filters .form-actions input {
-    margin: 5px 0;
+    margin: 10px 0;
     font-size: 17px;
     border-radius: 10px;
     padding: 5px 0;
@@ -355,15 +357,13 @@ html {
     cursor: pointer;
 }
 
-.main .category-list .category input {
-    height: 15px;
-    width: 15px;
-    margin: 0 15px 0 5px;
-}
-
-.main .category-list .category label {
-    color: #fff;
-    font-size: 18px;
+.main .category-list .category-filters #category {
+    margin: 0 15px 20px 5px;
+    font-size: 19px;
+    place-self: center;
+    width: 180px;
+    padding: 0 5px;
+    overflow-y: hidden;
 }
 
 .main .news-posts .posts,
@@ -386,11 +386,18 @@ html {
 }
 
 .main .news-posts .posts .title {
-    padding: 15px 25px;
+    padding: 15px 25px 0px;
+}
+
+.main .news-posts .posts .title p {
+    margin: 10px 0 0;
+    padding: 0;
 }
 
 .main .news-posts .posts .title .edit-btn {
     margin-left: -9px;
+    margin-top: 5px;
+    padding: 10px;
 }
 
 .main .news-posts .posts a {

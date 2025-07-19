@@ -5,30 +5,6 @@ require('header.php');
 include 'sessionHandler.php';
 requireLogin(); // Make sure user is logged in
 
-// Array of categories
-$categories = [
-    'Technology',
-    'Entertainment',
-    'Education',
-    'Content',
-    'Cybersecurity',
-    'Business',
-    'Infrastructure',
-    'Climate',
-    'Research',
-    'Innovation',
-    'Health',
-    'Transportation',
-    'Energy',
-    'Government',
-    'Local News',
-    'Science',
-    'Automotive',
-    'Food & Beverage',
-    'Retail',
-    'Gaming'
-];
-
 $titleError = '';
 $subtitleError = '';
 $reportError = '';
@@ -51,6 +27,9 @@ if(!(int)$post_id){
     exit();
 }
 
+$categoryQuery = $db->query('SELECT * FROM categories');
+$categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
+
 // get post to edit
 $posts = $db->prepare("SELECT * FROM posts WHERE post_id = :id");
 $posts->execute([':id'=>$post_id]);
@@ -72,13 +51,13 @@ if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'true'){
 
 // update post
 if(isset($_POST['update'])){
-    $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_SPECIAL_CHARS);
-    $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_SANITIZE_SPECIAL_CHARS);
-    $report = filter_input(INPUT_POST, 'report', FILTER_SANITIZE_SPECIAL_CHARS);
-    $category = filter_input(INPUT_POST, 'category', FILTER_SANITIZE_SPECIAL_CHARS);
-
+    $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
+    $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
+    $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
+    $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
+    
     if($title && $subtitle && $report){
-        $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category = :category WHERE post_id = :id");
+        $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category WHERE post_id = :id");
         $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id]);
         header('Location: index.php');
         exit();
@@ -108,20 +87,20 @@ if(isset($_POST['update'])){
                 <form action="" method="POST" id="editPostForm">
                     <div class="form-group">
                         <label for="title">Title:</label>
-                        <input type="text" id="title" name="title" value="<?= $post['title']?>" required>
+                        <input type="text" id="title" name="title" value="<?= htmlspecialchars($post['title'], ENT_QUOTES | ENT_HTML5)?>" required>
                         <span class="error"><?= $errors['title']?></span>
                     </div>
                     <div class="form-group">
                         <label for="subtitle">Subtitle:</label>
-                        <input type="text" id="subtitle" name="subtitle" value="<?= $post['subtitle']?>">
+                        <input type="text" id="subtitle" name="subtitle" value="<?= htmlspecialchars($post['subtitle'], ENT_QUOTES | ENT_HTML5)?>">
                         <span class="error"><?= $errors['subtitle']?></span>
                     </div>
                     <div class="form-group">
                         <label for="category">Select a Category:</label>
                         <select name="category" id="category" size="8" required>
                             <?php foreach($categories as $category): ?>
-                                <option value="<?= htmlspecialchars($category)?>" <?= $post['category'] == $category ? 'selected' : ''?>>
-                                    <?= $category?>
+                                <option value="<?= $category['category_id']?>" <?= $category['category_id'] == $post['category_id'] ? 'selected' : ''?>>
+                                    <?= $category['category_name']?>
                                 </option>
                             <?php endforeach ?>
                         </select>
