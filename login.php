@@ -21,11 +21,11 @@ if($_POST && !empty($_POST['login'])){
         $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
         $password = $_POST['password'];
 
-        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
-        $stmt->execute([':username'=>$username, ':password'=>$password]);
+        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt->execute([':username'=>$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($user){
+        if($user && password_verify($password, $user['password'])){
             $loggedIn = true;
 
             $_SESSION['user_id'] = $user['user_id'];
