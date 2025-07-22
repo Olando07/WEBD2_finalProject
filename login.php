@@ -93,6 +93,7 @@ if($_POST && !empty($_POST['login'])){
         </div>
     </div>
 <!-- admin account pass: greatnesswithGod -->
+<!-- regular account pass: itisnotclockingtoyou -->
 
     <script>
         function showPassword(){

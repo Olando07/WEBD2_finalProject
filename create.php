@@ -5,10 +5,23 @@ require('header.php');
 include 'sessionHandler.php';
 requireLogin(); // Make sure user is logged in
 
+require './php-image-resize-master/lib/ImageResize.php';
+require './php-image-resize-master/lib/ImageResizeException.php';
+
+$errors = [];
+$post = ['title'=>'', 'subtitle'=>'', 'category_id'=>'', 'report'=>''];
+
+try{
+    $stmt = $db->query("SELECT * FROM categories ORDER BY category_id");
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}catch(PDOException $e){
+    $errors['general'] = "Errors loading categories:" . $e->getMessage();
+    $categories = [];
+}
+
 // if(){
 
 // }
-
 
 ?>
 <!DOCTYPE html>
@@ -20,19 +33,19 @@ requireLogin(); // Make sure user is logged in
     <title>Winnipeg News: Create a post</title>
 </head>
 <body>
-    <div class="main">
-        <div class="edit-form">
+    <div class="create-main">
+        <div class="create-form">
             <h2>Edit this post</h2>
 
-            <form action="" method="POST" id="editPostForm">
+            <form action="" method="POST" id="createPostForm">
                 <div class="form-group">
                     <label for="title">Title:</label>
-                    <input type="text" id="title" name="title" value="<?= htmlspecialchars($post['title'], ENT_QUOTES | ENT_HTML5)?>" required>
+                    <input type="text" id="title" name="title" value="<?= isset($_POST['title']) ? htmlspecialchars( $_POST['title']) : ''?>" required>
                     <span class="error"><?= $errors['title']?></span>
                 </div>
                 <div class="form-group">
                     <label for="subtitle">Subtitle:</label>
-                    <input type="text" id="subtitle" name="subtitle" value="<?= htmlspecialchars($post['subtitle'], ENT_QUOTES | ENT_HTML5)?>">
+                    <input type="text" id="subtitle" name="subtitle" value="<?=isset( $_POST['subtitle']) ? htmlspecialchars( $_POST['subtitle']) : '' ?>" required>
                     <span class="error"><?= $errors['subtitle']?></span>
                 </div>
                 <div class="form-group">
@@ -51,7 +64,7 @@ requireLogin(); // Make sure user is logged in
                 </div>
 
                 <div class="form-actions">
-                    <input type="create" name="create" value="Create Post" class="create-btn">
+                    <input type="button" name="create" value="Create Post" class="create-btn">
                     <a href="index.php" class="cancel-btn">cancel</a>
                 </div>
             </form>
