@@ -127,6 +127,7 @@ if(!empty($selectedCategory)){
                             <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
                             <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
                         </div>
+                        <!-- TODO: show date when post was last update -->
                     </div>
                 <?php endif?>
             <?php endwhile?>

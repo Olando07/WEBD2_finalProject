@@ -13,6 +13,23 @@ $subtitleError = '';
 $reportError = '';
 $post = ['title'=>'', 'subtitle'=>'', 'category_id'=>'', 'report'=>''];
 
+function uploadPath($fileName, $uploadFolder = 'uploads'){
+    $currentFolder = dirname(__FILE__);
+    $path = [$currentFolder, $uploadFolder, basename($fileName)];
+    
+    return join(DIRECTORY_SEPARATOR, $path);
+}
+
+function validFile($tempPath, $newPath){
+    $validFileTypes = ['gif', 'jpg', 'jpeg', 'png'];
+
+    $fileType = pathinfo($newPath, PATHINFO_EXTENSION);
+    
+    $isValidFileType = in_array($fileType, $validFileTypes);
+    
+    return $isValidFileType;
+}
+
 try{
     $stmt = $db->query("SELECT * FROM categories ORDER BY category_id");
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -21,29 +38,59 @@ try{
     $categories = [];
 }
 
-try{
-
-}catch(PDOException $e){
-
-}
-
 if($_POST && !empty($_POST['create'])){
     $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
     $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
     $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
 
-    if($title && $subtitle && $report){
-        $posts = $db->prepare("INSERT INTO posts(title, subtitle, report, category_id, creator_id) VALUES(:title, :subtitle, :report, :category, :creator)");
-        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id']]);
-        header('Location: index.php');
-        exit();
-    }
+    $uploadImage = isset($_FILES['image']) && ($_FILES['image']['error'] === 0);
+    $uploadError = isset($_FILES['image']) && ($_FILES['image']['error'] > 0);
+    $uploadedFile = '';
+    $resized50Path = '';
 
-    if (empty($title)) $errors['title'] = 'The title is required'; 
-    if (empty($subtitle)) $errors['subtitle'] = 'This subtitle is required'; 
-    if (empty($report)) $errors['report'] = 'This report is required'; 
+    if($uploadImage){
+        $imageFileName = $_FILES['image']['name'];
+        $tempImagePath = $_FILES['image']['tmp_name'];
+        $newPath = uploadPath($imageFileName);
+
+        if(validFile($tempImagePath, $newPath)){
+            if(move_uploaded_file($tempImagePath, $newPath)){
+                $uploadedFile = $newPath;
+                
+                try{
+                    // Resize to 50px width
+                    $image50 = new \Gumlet\ImageResize($newPath);
+                    $image50->resizeToWidth(50);
+                    $resized50Path = uploadPath('50px_' . $imageFileName);
+                    $image50->save($resized50Path);
+                }catch(Exception $e){
+                    $errors['images'] = "Error processing the image" . $e->getMessage();
+                }
+            }else{
+                $errors['images'] = "Failed to upload image";
+            }
+        }else{
+            $errors['images'] = "Invalid file type. Only gif, png, jpg and jpeg file types are allowed.";    
+        }
+    }elseif($uploadError){
+        $errors['image'] = 'Error uploading file';
+    }
+    
+
+
 }
+
+if($title && $subtitle && $report){
+    $posts = $db->prepare("INSERT INTO posts(title, subtitle, report, category_id, creator_id) VALUES(:title, :subtitle, :report, :category, :creator)");
+    $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id']]);
+    header('Location: index.php');
+    exit();
+}
+
+if (empty($title)) $errors['title'] = 'The title is required'; 
+if (empty($subtitle)) $errors['subtitle'] = 'This subtitle is required'; 
+if (empty($report)) $errors['report'] = 'This report is required'; 
 
 ?>
 <!DOCTYPE html>
