@@ -23,8 +23,11 @@ if($_POST && !empty($_POST['login'])){
 
         $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
         $stmt->execute([':username'=>$username]);
+        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt->execute([':username'=>$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if($user && password_verify($password, $user['password'])){
         if(!$user){
             // password_verify(W$password, )
             $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
