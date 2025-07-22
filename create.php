@@ -57,12 +57,12 @@ if($_POST && !empty($_POST['create'])){
                 <div class="form-group">
                     <label for="title">Title:</label>
                     <input type="text" id="title" name="title" value="<?= isset($post['title']) ? htmlspecialchars( $post['title']) : ''?>" required>
-                    <span class="error"><?= $titleError['title']?></span>
+                    <span class="error"><?= $titleError?></span>
                 </div>
                 <div class="form-group">
                     <label for="subtitle">Subtitle:</label>
                     <input type="text" id="subtitle" name="subtitle" value="<?= isset($post['subtitle']) ? htmlspecialchars( $post['subtitle']) : '' ?>" required>
-                    <span class="error"><?= $subtitleEror['subtitle']?></span>
+                    <span class="error"><?= $subtitleError?></span>
                 </div>
                 <div class="form-group">
                     <label for="category">Select a Category:</label>
