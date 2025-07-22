@@ -28,20 +28,21 @@ if($_POST && !empty($_POST['login'])){
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($user && password_verify($password, $user['password'])){
-        if(!$user){
-            // password_verify(W$password, )
-            $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
-        }else if(!password_verify($password, $user['password'])){
-            $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
-        }else{
-            $loggedIn = true;
+            if(!$user){
+                // password_verify(W$password, )
+                $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
+            }else if(!password_verify($password, $user['password'])){
+                $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
+            }else{
+                $loggedIn = true;
 
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['logged_in'] = true;
+                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['logged_in'] = true;
 
-            header('Location: index.php');
-            exit();
+                header('Location: index.php');
+                exit();
+            }
         }
     }
 }

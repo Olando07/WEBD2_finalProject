@@ -60,7 +60,7 @@ if(!empty($selectedCategory)){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
-    <title>Winnipeg News: View News Posts</title>
+    <title>Winnipeg News: Home</title>
 </head>
 <body>
     <div class='main'>
