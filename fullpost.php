@@ -1,7 +1,7 @@
 <?php
 
 require('connect.php');
-require('header.php');
+require_once('header.php');
 include_once 'sessionHandler.php';
 
 $id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT); 

@@ -1,14 +1,16 @@
 <?php
 
 require('connect.php');
-require('header.php'); // add require once
+require_once('header.php');
 include_once 'sessionHandler.php';
 requireLogin(); // Make sure user is logged in
 
 require './php-image-resize-master/lib/ImageResize.php';
 require './php-image-resize-master/lib/ImageResizeException.php';
 
-$errors = [];
+$titleError = '';
+$subtitleError = '';
+$reportError = '';
 $post = ['title'=>'', 'subtitle'=>'', 'category_id'=>'', 'report'=>''];
 
 try{
@@ -19,9 +21,23 @@ try{
     $categories = [];
 }
 
-// if(){
+if($_POST && !empty($_POST['create'])){
+    $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
+    $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
+    $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
+    $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
 
-// }
+    if($title && $subtitle && $report){
+        $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category WHERE post_id = :id");
+        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id]);
+        header('Location: index.php');
+        exit();
+    }
+
+    if (empty($title)) $errors['title'] = 'The title is required'; 
+    if (empty($subtitle)) $errors['subtitle'] = 'This subtitle is required'; 
+    if (empty($report)) $errors['report'] = 'This report is required'; 
+}
 
 ?>
 <!DOCTYPE html>
@@ -40,12 +56,12 @@ try{
             <form action="" method="POST" id="createPostForm">
                 <div class="form-group">
                     <label for="title">Title:</label>
-                    <input type="text" id="title" name="title" value="<?= isset($_POST['title']) ? htmlspecialchars( $_POST['title']) : ''?>" required>
+                    <input type="text" id="title" name="title" value="<?= isset($post['title']) ? htmlspecialchars( $post['title']) : ''?>" required>
                     <span class="error"><?= $errors['title']?></span>
                 </div>
                 <div class="form-group">
                     <label for="subtitle">Subtitle:</label>
-                    <input type="text" id="subtitle" name="subtitle" value="<?=isset( $_POST['subtitle']) ? htmlspecialchars( $_POST['subtitle']) : '' ?>" required>
+                    <input type="text" id="subtitle" name="subtitle" value="<?= isset($post['subtitle']) ? htmlspecialchars( $post['subtitle']) : '' ?>" required>
                     <span class="error"><?= $errors['subtitle']?></span>
                 </div>
                 <div class="form-group">
@@ -71,7 +87,6 @@ try{
         </div>
     </div>
 
- <!-- TODO: only admins can create posts -->
  <!-- TODO: add comments button which shows a pop with comments from other users. users can create, edit and delete comments  -->
 
 </body>

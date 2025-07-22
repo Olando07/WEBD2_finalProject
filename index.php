@@ -90,7 +90,7 @@ if(!empty($selectedCategory)){
                     </div>
                 </div>
         </div>
-                <?php include 'header.php'?>
+                <?php include_once 'header.php'?>
             </form>
 
         <?php 
