@@ -21,6 +21,12 @@ try{
     $categories = [];
 }
 
+try{
+
+}catch(PDOException $e){
+
+}
+
 if($_POST && !empty($_POST['create'])){
     $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
     $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
@@ -28,8 +34,8 @@ if($_POST && !empty($_POST['create'])){
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
 
     if($title && $subtitle && $report){
-        $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category WHERE post_id = :id");
-        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id]);
+        $posts = $db->prepare("INSERT INTO posts(title, subtitle, report, category_id, creator_id) VALUES(:title, :subtitle, :report, :category, :creator)");
+        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id']]);
         header('Location: index.php');
         exit();
     }
@@ -56,12 +62,12 @@ if($_POST && !empty($_POST['create'])){
             <form action="" method="POST" id="createPostForm">
                 <div class="form-group">
                     <label for="title">Title:</label>
-                    <input type="text" id="title" name="title" value="<?= isset($post['title']) ? htmlspecialchars( $post['title']) : ''?>" required>
+                    <input type="text" id="title" name="title" value="<?= isset($post['title']) ? htmlspecialchars( $post['title']) : ''?>" required placeholder="Enter post title">
                     <span class="error"><?= $titleError?></span>
                 </div>
                 <div class="form-group">
                     <label for="subtitle">Subtitle:</label>
-                    <input type="text" id="subtitle" name="subtitle" value="<?= isset($post['subtitle']) ? htmlspecialchars( $post['subtitle']) : '' ?>" required>
+                    <input type="text" id="subtitle" name="subtitle" value="<?= isset($post['subtitle']) ? htmlspecialchars( $post['subtitle']) : '' ?>" required placeholder="Enter post subtitle">
                     <span class="error"><?= $subtitleError?></span>
                 </div>
                 <div class="form-group">
@@ -80,7 +86,7 @@ if($_POST && !empty($_POST['create'])){
                 </div>
 
                 <div class="form-actions">
-                    <input type="button" name="create" value="Create Post" class="create-btn">
+                    <input type="submit" name="create" value="Create Post" class="create-btn">
                     <a href="index.php" class="cancel-btn">cancel</a>
                 </div>
             </form>

@@ -1,0 +1,5 @@
+webDevFinal issues
+
+stack overflow: 
+https://stackoverflow.com/questions/50691581/php-cannot-redeclare-function-previously-defined
+https://stackoverflow.com/questions/1953857/fatal-error-cannot-redeclare-function
