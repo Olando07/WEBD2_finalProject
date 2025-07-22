@@ -1,8 +1,8 @@
 <?php
 
 require('connect.php');
-require('header.php');
-include 'sessionHandler.php';
+require('header.php'); // add require once
+include_once 'sessionHandler.php';
 requireLogin(); // Make sure user is logged in
 
 require './php-image-resize-master/lib/ImageResize.php';

@@ -1,7 +1,7 @@
 <?php
 
 require('connect.php');
-include 'sessionHandler.php';
+include_once 'sessionHandler.php';
 requireLogin();
 
 // Logout handle

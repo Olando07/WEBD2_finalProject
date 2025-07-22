@@ -2,7 +2,7 @@
 
 require('connect.php');
 require('header.php');
-include 'sessionHandler.php';
+include_once 'sessionHandler.php';
 
 $id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT); 
 

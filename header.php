@@ -1,6 +1,6 @@
 <?php
 
-include 'sessionHandler.php';
+include_once 'sessionHandler.php';
 
 $userSearch = $_GET['search-bar'] ?? '';
 

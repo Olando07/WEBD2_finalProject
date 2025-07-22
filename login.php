@@ -1,7 +1,7 @@
 <?php
 
 require('connect.php');
-include 'sessionHandler.php';
+include_once 'sessionHandler.php';
 
 $userNameError = null;
 $passwordError = null;

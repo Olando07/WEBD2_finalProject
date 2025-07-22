@@ -2,7 +2,7 @@
 
 require('connect.php');
 require('header.php');
-include 'sessionHandler.php';
+include_once 'sessionHandler.php';
 requireLogin(); // Make sure user is logged in
 
 $titleError = '';
