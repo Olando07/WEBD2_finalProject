@@ -31,7 +31,7 @@ $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
             <a href="create.php" id="createpost">Create</a>
 
             <!-- Log out button -->
-            <a href="login.php" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>
+            <a href="index.php?action=logout" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>
         </nav>
     </div>
 
@@ -57,9 +57,8 @@ $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
         }
 
         function clearAll(){
-            document.querySelectorAll('input[name="selected_categories[]"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
+            let category = document.getElementById('category');
+            category.value = '';
 
             document.querySelector('form').submit();
         }

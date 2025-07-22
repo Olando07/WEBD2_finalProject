@@ -6,12 +6,13 @@ requireLogin();
 
 // Logout handle
 if(isset($_GET['action']) && $_GET['action'] === 'logout'){
-    session_unset();
-    session_destroy();
+    $_SESSION = array();
     
     if(isset($_COOKIE[session_name()])){
         setcookie(session_name(), '', time()-3600, '/');
     }
+
+    session_destroy();
     
     header('Location: login.php');
     exit();
@@ -21,7 +22,7 @@ $categoryQuery = $db->query('SELECT * FROM categories');
 $categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = null;
-$selectedCategory = $_GET['category'] ?? '';
+$selectedCategory = isset($_GET['category']) ? $_GET['category'] : '';
 $userSearch = (filter_input(INPUT_GET, 'search-bar', FILTER_SANITIZE_SPECIAL_CHARS)) ?? '';
 $editBtn = null;
 
@@ -71,10 +72,10 @@ if(!empty($selectedCategory)){
                     <!-- Categories users can select -->
                      <select name="category" id="category">
                         <option value="placeholder" id="placeholder">
-                            Select a category
+                            All categories
                         </option>
                          <?php foreach($categories as $category): ?>
-                             <option value="<?= $category['category_id']?>" >
+                             <option value="<?= $category['category_id']?>" <?= $selectedCategory == $category['category_id'] ? 'selected' : ''?>>
                                  <?= $category['category_name']?>
                              </option>
                          <?php endforeach ?>
@@ -85,7 +86,7 @@ if(!empty($selectedCategory)){
                         <!-- Submit button to apply the filters -->
                         <input type="submit" value="Apply Filter" class="filter-btn" name="search-btn" onclick="applyFilter()">
                         <!-- Clear button to remove filters -->
-                        <input type="submit" value="Clear All" onclick="clearAll()">
+                        <input type="submit" value="Clear Filter" onclick="clearAll()">
                     </div>
                 </div>
         </div>
@@ -120,8 +121,6 @@ if(!empty($selectedCategory)){
                                 <?= $editBtn?>
                             </p>
                         </h3>
-
-                            
 
                         <p><?= htmlspecialchars($row['report'], ENT_QUOTES | ENT_HTML5)?></p>
                         <div class="post-bottom">
