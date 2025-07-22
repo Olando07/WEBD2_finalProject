@@ -59,11 +59,7 @@ requireLogin(); // Make sure user is logged in
     </div>
 
  <!-- TODO: only admins can create posts -->
- <!-- TODO: make the page fetch info from database based on selected category or input in the search field -->
  <!-- TODO: add comments button which shows a pop with comments from other users. users can create, edit and delete comments  -->
-
-
-
 
 </body>
 </html>
