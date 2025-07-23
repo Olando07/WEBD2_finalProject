@@ -4,6 +4,10 @@ require('connect.php');
 include_once 'sessionHandler.php';
 requireLogin();
 
+// image resize library
+require './php-image-resize-master/lib/ImageResize.php';
+require './php-image-resize-master/lib/ImageResizeException.php';
+
 // Logout handle
 if(isset($_GET['action']) && $_GET['action'] === 'logout'){
     $_SESSION = array();
@@ -18,6 +22,7 @@ if(isset($_GET['action']) && $_GET['action'] === 'logout'){
     exit();
 }    
 
+// Fetches categories
 $categoryQuery = $db->query('SELECT * FROM categories');
 $categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
 
@@ -30,28 +35,51 @@ $editBtn = null;
 if(!empty($selectedCategory)){
     if($_GET['search-bar']){
         // Both category filter and search 
-        $stmt = $db->prepare("SELECT p.*, c.category_name FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.category_id = ? AND p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? AND p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
         $posts=$stmt;
         $posts->execute([$selectedCategory, $searchPattern]); 
     }else{
         // Category filter only
-        $stmt = $db->prepare("SELECT p.*, c.category_name FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.category_id = ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $posts=$stmt;
         $posts->execute([$selectedCategory]);      
     }
 }else{
     if(isset($_GET['search-btn']) && $_GET['search-bar']){
         // Search only 
-        $stmt = $db->prepare("SELECT p.*, c.category_name FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
         $posts = $stmt;
         $posts->execute([$searchPattern]);
     }else{
         // No category filter or search
-        $posts=$db->query("SELECT p.*, c.category_name FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $posts=$db->query("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id ORDER BY p.time_created DESC, p.title, p.subtitle");
     }
 }   
+
+// function to create resized images
+function createResizedImage($db, $imageId, $originalPath){
+    global $db;
+
+    if(!$originalPath || !file_exists($originalPath)){
+        return false;
+    }
+
+    try{
+        // get file info
+        $pathInfo = pathinfo($originalPath);
+        $fileName = $pathInfo['filename'];
+        $extension = $pathInfo['extension'];
+        $directory =$pathInfo['dirname'];
+
+        
+
+    }catch(Exception $e){
+
+    }
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -121,6 +149,10 @@ if(!empty($selectedCategory)){
                                 <?= $editBtn?>
                             </p>
                         </h3>
+
+                        <?php if(!empty($row['image_path'])): ?>
+                            <img src="<?= $row['image_path']?>" alt="<?= $row['image_name']?>">
+                        <?php endif ?>
 
                         <p><?= htmlspecialchars($row['report'], ENT_QUOTES | ENT_HTML5)?></p>
                         <div class="post-bottom">

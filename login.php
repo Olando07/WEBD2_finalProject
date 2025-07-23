@@ -1,5 +1,8 @@
 <?php
 
+// admin account pass: greatnesswithGod
+// regular account pass: itisnotclockingtoyou
+
 require('connect.php');
 include_once 'sessionHandler.php';
 
@@ -29,7 +32,6 @@ if($_POST && !empty($_POST['login'])){
 
         if($user && password_verify($password, $user['password'])){
             if(!$user){
-                // password_verify(W$password, )
                 $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
             }else if(!password_verify($password, $user['password'])){
                 $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
@@ -40,8 +42,8 @@ if($_POST && !empty($_POST['login'])){
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['logged_in'] = true;
 
-                header('Location: index.php');
-                exit();
+                // header('Location: index.php');
+                // exit();
             }
         }
     }
@@ -92,8 +94,6 @@ if($_POST && !empty($_POST['login'])){
             </form>
         </div>
     </div>
-<!-- admin account pass: greatnesswithGod -->
-<!-- regular account pass: itisnotclockingtoyou -->
 
     <script>
         function showPassword(){

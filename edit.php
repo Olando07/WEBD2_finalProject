@@ -104,6 +104,12 @@ if(isset($_POST['update'])){
                             <?php endforeach ?>
                         </select>
                     </div>
+                    <div class="form-group image-upload">
+                        <label for="image">Upload Image (Optional):</label>
+                        <input type="file" id="image" name="image" accept='image/*'>
+                        <small>Allowed formats: GIF, JPG, JPEG, PNG</small>
+                        <span class="error"><?= isset($errors['images']) ? $errors['images']: ''?></span>
+                    </div>
                     <div class="form-group">
                         <label for="report">Content</label>
                         <textarea name="report" id="report" rows="10" required><?= $post['report']?></textarea>
