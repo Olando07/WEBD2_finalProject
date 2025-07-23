@@ -1,8 +1,8 @@
 <?php
 
 require('connect.php');
-require('header.php');
-include 'sessionHandler.php';
+require_once('header.php');
+include_once 'sessionHandler.php';
 
 $id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT); 
 
@@ -20,7 +20,7 @@ if((int)$id == 0){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
-    <title>Winnipeg News</title>
+    <title>Winnipeg News: <?= $row['title']?></title>
 </head>
 <body>
     

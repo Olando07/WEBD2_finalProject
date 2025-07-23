@@ -479,11 +479,11 @@ html {
 }
 
 /* Styles for edit page */
-.edit-main {
+.edit-main, .create-main {
     padding: 80px 10px 80px;
 }
 
-.edit-main .edit-form {
+.edit-main .edit-form, .create-main .create-form {
     background-color: #fff;
     place-self: center;
     padding: 30px;
@@ -493,50 +493,53 @@ html {
     box-shadow: 0 10px 8px rgba(0, 0, 0, 0.2), 0px -10px 8px rgba(0, 0, 0, 0.2), -10px 0px 8px rgba(0, 0, 0, 0.2), 10px 0px 8px rgba(0, 0, 0, 0.2);
 }
 
-.edit-main .edit-form h2 {
+.edit-main .edit-form h2, .create-main .create-form h2 {
     place-self: center;
 }
 
 .edit-main .edit-form,
 .edit-main .edit-form form,
-.edit-main .edit-form form .form-group {
+.edit-main .edit-form form .form-group,
+.create-main .create-form,
+.create-main .create-form form,
+.create-main .create-form form .form-group {
     display: flex;
     flex-direction: column;
 }
 
-.edit-main .edit-form form {
+.edit-main .edit-form form, .create-main .create-form form {
     gap: 20px;
 }
 
-.edit-main .edit-form form .form-group {
+.edit-main .edit-form form .form-group, .create-main .create-form form .form-group {
     gap: 10px;
 }
 
-.edit-main .edit-form form .form-group label {
+.edit-main .edit-form form .form-group label, .create-main .create-form form .form-group label {
     font-size: 18px;
 }
 
-.edit-main .edit-form form .form-group input {
+.edit-main .edit-form form .form-group input, .create-main .create-form form .form-group input {
     font-size: 18px;
     padding: 2px 4px;
 }
 
-.edit-main .edit-form form .form-group select {
+.edit-main .edit-form form .form-group select, .create-main .create-form form .form-group select {
     font-size: 17px;
     width: 200px;
     cursor: pointer;
 }
 
-.edit-main .edit-form form .form-group select option {
+.edit-main .edit-form form .form-group select option, .create-main .create-form form .form-group select option {
     padding: 5px 10px;
 }
 
-.edit-main .edit-form form .form-group textarea {
+.edit-main .edit-form form .form-group textarea, .create-main .create-form form .form-group textarea {
     padding: 15px;
     font-size: 17px;
 }
 
-.edit-main .edit-form form .form-actions {
+.edit-main .edit-form form .form-actions, .create-main .create-form form .form-actions {
     padding: 50px 0px 20px;
     display: flex;
     flex-direction: row;
@@ -545,7 +548,7 @@ html {
     align-items: center;
 }
 
-.edit-main .edit-form form .form-actions input,
+.edit-main .edit-form form .form-actions input, .create-main .create-form form .form-actions input,
 .cancel-btn {
     padding: 8px 10px;
     font-size: 17px;
@@ -555,7 +558,7 @@ html {
     color: #fff;
 }
 
-.edit-main .edit-form form .form-actions .update-btn {
+.edit-main .edit-form form .form-actions .update-btn, .create-main .create-form form .form-actions .create-btn {
     background-color: #00ff62;
 }
 
@@ -571,7 +574,8 @@ html {
 
 .update-btn:hover,
 .delete-btn:hover,
-.cancel-btn:hover {
+.cancel-btn:hover,
+.create-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
 }

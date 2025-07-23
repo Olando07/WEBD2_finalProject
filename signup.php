@@ -32,7 +32,7 @@ if($_POST && !empty($_POST['signup'])){
         $noError = false;
     }
     
-    if(empty($_POST['age']) || $_POST['age'] < 16 || $_POST['age'] > 75){
+    if(empty($_POST['age']) || $_POST['age'] < 16 || $_POST['age'] > 100){
         $ageError = "Please enter a valid age. <br/> You must be atleast 16 years old.";
         $noError = false;
     }
@@ -52,9 +52,7 @@ if($_POST && !empty($_POST['signup'])){
         $noError = false;
     }
     
-    if(!$usernameError && !$passwordError){  
-        $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
-        $password = $_POST['password'];
+    if(!$usernameError && !$passwordError){   
         $reenterPassword = $_POST['password-confirm'];
     }
 

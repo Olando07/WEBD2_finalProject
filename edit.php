@@ -1,8 +1,8 @@
 <?php
 
 require('connect.php');
-require('header.php');
-include 'sessionHandler.php';
+require_once('header.php');
+include_once 'sessionHandler.php';
 requireLogin(); // Make sure user is logged in
 
 $titleError = '';

@@ -1,5 +1,7 @@
 <?php
 
+include_once 'sessionHandler.php';
+
 $userSearch = $_GET['search-bar'] ?? '';
 
 if(isset($_GET['search-bar']) && !empty($_GET['search-bar'])) {
@@ -7,6 +9,10 @@ if(isset($_GET['search-bar']) && !empty($_GET['search-bar'])) {
 }
 
 $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
+
+$userId = $_SESSION['user_id'];
+$user = $db->query("SELECT * FROM users WHERE user_id = '$userId'");
+$userinfo = $user->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -28,7 +34,11 @@ $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
             <a href="index.php" id="homepage">Home</a>
 
             <!-- Link to create page -->
-            <a href="create.php" id="createpost">Create</a>
+            <?php if($userinfo['is_admin'] == 1): ?>
+                <a href="create.php" id="createpost">Create</a>
+            <?php endif ?>
+
+            <a href="index.php" id="userInfo"><?= $userinfo['username']?></a>
 
             <!-- Log out button -->
             <a href="index.php?action=logout" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>

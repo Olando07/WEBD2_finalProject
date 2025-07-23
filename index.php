@@ -1,7 +1,7 @@
 <?php
 
 require('connect.php');
-include 'sessionHandler.php';
+include_once 'sessionHandler.php';
 requireLogin();
 
 // Logout handle
@@ -60,7 +60,7 @@ if(!empty($selectedCategory)){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
-    <title>Winnipeg News: View News Posts</title>
+    <title>Winnipeg News: Home</title>
 </head>
 <body>
     <div class='main'>
@@ -90,7 +90,7 @@ if(!empty($selectedCategory)){
                     </div>
                 </div>
         </div>
-                <?php include 'header.php'?>
+                <?php include_once 'header.php'?>
             </form>
 
         <?php 
@@ -127,6 +127,7 @@ if(!empty($selectedCategory)){
                             <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
                             <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
                         </div>
+                        <!-- TODO: show date when post was last update -->
                     </div>
                 <?php endif?>
             <?php endwhile?>
