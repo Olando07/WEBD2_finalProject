@@ -1,7 +1,7 @@
 <?php
-    define('DB_DSN','mysql:host=localhost;dbname=news;charset=utf8');
+    define('DB_DSN','mysql:host=localhost;dbname=winnipeg_news;charset=utf8');
     define('DB_USER', 'serveruser');
-    define('DB_PASS', 'U8R8BRsbak/fbFJm');
+    define('DB_PASS', 'wDhHoHzmIrivLdkv');
 
     try{
         $db=new PDO(DB_DSN, DB_USER, DB_PASS);

@@ -70,10 +70,11 @@ if($_POST && !empty($_POST['signup'])){
     $age = filter_input(INPUT_POST, 'age', FILTER_SANITIZE_NUMBER_INT);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
-    $password = $_POST['password'];
+    $password = $_POST['password']; 
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     if($noError){
-        $user->execute([':username'=>$username, ':password'=>$password, ':firstName'=>$fName, ':lastName'=>$lName, ':age'=>$age, ':email'=>$email]);
+        $user->execute([':username'=>$username, ':password'=>$hashedPassword, ':firstName'=>$fName, ':lastName'=>$lName, ':age'=>$age, ':email'=>$email]);
         $accountCreated = true;
 
         $_POST["username"] = '';
