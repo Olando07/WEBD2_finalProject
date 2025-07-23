@@ -80,7 +80,6 @@ if(isset($_POST['update'])){
 </head>
 <body>
     <div class="edit-main">
-        
             <div class="edit-form">
                 <h2>Edit this post</h2>
 

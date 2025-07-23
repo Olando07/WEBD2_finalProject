@@ -8,6 +8,11 @@ requireLogin(); // Make sure user is logged in
 require './php-image-resize-master/lib/ImageResize.php';
 require './php-image-resize-master/lib/ImageResizeException.php';
 
+$title = '';
+$subtitle = '';
+$report = '';
+$category = '';
+
 $titleError = '';
 $subtitleError = '';
 $reportError = '';
