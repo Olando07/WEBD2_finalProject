@@ -73,11 +73,34 @@ function createResizedImage($db, $imageId, $originalPath){
         $extension = $pathInfo['extension'];
         $directory =$pathInfo['dirname'];
 
+        $thumbnailPath = $directory . '/' . $fileName . '_thumb.' . $extension;
+        if(!file_exists($thumbnailPath)){
+            $image = new Gumlet\ImageResize($originalPath);
+            $image->resizeToBestFit(300, 200);
+            $image->save($thumbnailPath);
+        }
         
+        $fullsizePath = $directory . '/' . $fileName . '_full.' . $extension;
+        if(!file_exists($fullsizePath)){
+            $image = new Gumlet\ImageResize($originalPath);
+            $image->resizeToBestFit(800, 600);
+            $image->save($fullsizePath);
+        }
+        
+        $stmt = $db->prepare('UPDATE images SET thumbnail_path = ?, fullsize_path = ? WHERE image_id = ?');
+        $stmt->execute([$thumbnailPath, $fullsizePath, $imageId]);
+
+        return ['thumbnail'=>$thumbnailPath, 'fullsize'=>$fullsizePath];
 
     }catch(Exception $e){
-
+        error_log("Image resize error: " . $e->getMessage());
+        return false;
     }
+}
+
+// Function to get image path
+function getImagePath($db, $imageId, $originalPath){
+
 }
 
 
