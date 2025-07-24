@@ -380,6 +380,11 @@ html {
     margin: 0 0 30px;
 }
 
+.main .news-posts .posts {
+    display: flex;
+    flex-direction: column;
+}
+
 .main .news-posts .posts p {
     padding: 0 25px;
     margin: 15px 0;
@@ -553,7 +558,7 @@ html {
 }
 
 .create-main .create-form form .image-upload {
-
+ 
 }
 
 .edit-main .edit-form form .form-actions input, .create-main .create-form form .form-actions input,

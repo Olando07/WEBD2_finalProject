@@ -47,5 +47,8 @@ if((int)$id == 0){
             </div>
         </div>
     </div>
+
+    <!-- TODO: add comments button which shows a pop with comments from other users. users can create, edit and delete comments  -->
+
 </body>
 </html>

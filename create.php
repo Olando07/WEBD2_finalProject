@@ -185,11 +185,20 @@ if($_POST && !empty($_POST['create'])){
                     <small>Allowed formats: GIF, JPG, JPEG, PNG</small>
                     <span class="error"><?= isset($errors['images']) ? $errors['images']: ''?></span>
                 </div>
-                <div class="form-group">
-                    <label for="report">Content</label>
-                    <textarea name="report" id="report" rows="10" required><?= isset($_POST['report']) ? htmlspecialchars( $_POST['report']) : ''?></textarea>
+
+                <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+                <div class="form-group" id="report-textarea">
+                    <label for="report"></label>
                     <span class="error"><?= isset($errors['report']) ? $errors['report']: ''?></span>
                 </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+                <script>
+                const quill = new Quill('#report-textarea', {
+                    theme: 'snow',
+                });
+                </script>
+
                 <div class="form-actions">
                     <input type="submit" name="create" value="Create Post" class="create-btn">
                     <a href="index.php" class="cancel-btn">cancel</a>
@@ -197,8 +206,6 @@ if($_POST && !empty($_POST['create'])){
             </form>
         </div>
     </div>
-
- <!-- TODO: add comments button which shows a pop with comments from other users. users can create, edit and delete comments  -->
 
 </body>
 </html>

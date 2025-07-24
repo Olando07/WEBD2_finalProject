@@ -40,6 +40,44 @@ if(!$post){
     exit();
 }
 
+function uploadPath($fileName, $uploadFolder = 'uploads'){
+    $currentFolder = dirname(__FILE__);
+    $path = [$currentFolder, $uploadFolder, basename($fileName)];
+    
+    return join(DIRECTORY_SEPARATOR, $path);
+}
+
+function validFile($tempPath, $newPath){
+    $validFileTypes = ['gif', 'jpg', 'jpeg', 'png'];
+
+    // Check if file exists and is readable
+    if (!is_uploaded_file($tempPath)) {
+        return false;
+    }
+
+    // Checks file type
+    $fileType = pathinfo($newPath, PATHINFO_EXTENSION);
+    $isValidFileType = in_array($fileType, $validFileTypes);
+    
+    // Additional MIME type check for security
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $tempPath);
+    finfo_close($finfo);
+    
+    $validMimeTypes = ['image/gif', 'image/jpeg', 'image/png'];
+    $isValidMimeType = in_array($mimeType, $validMimeTypes);
+
+    return $isValidFileType && $isValidMimeType;
+}
+
+// Create uploads directory if it doesn't exist
+$uploadsDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uploads';
+if (!is_dir($uploadsDir)) {
+    if (!mkdir($uploadsDir, 0755, true)) {
+        $errors['general'] = "Could not create uploads directory";
+    }
+}
+
 // form submission
 // delete post
 if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'true'){
@@ -56,11 +94,55 @@ if(isset($_POST['update'])){
     $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
     
+    // keep old image id as a default
+    $imageId = $post['image_id'];
+
+    // image upload
+    if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
+        // filename sanitization
+        $imageFileName = preg_replace('/[^a-zA-Z0-9._-]/', '',basename($_FILES['image']['name']));
+        $tempImagePath = $_FILES['image']['tmp_name'];
+        $fileExtension = pathinfo($imageFileName, PATHINFO_EXTENSION);
+        $uniqueFileName = time() . '_' . mt_rand(1000, 9999) . '.' . $fileExtension;
+        $newPath = uploadPath($uniqueFileName);
+        $imageRelPath = 'uploads/' . $uniqueFileName;
+
+        if (validFile($tempImagePath, $newPath)) {
+            if(move_uploaded_file($tempImagePath, $newPath)){
+                // add image to database
+                $imgStmt = $db->prepare("INSERT INTO images (image_name, image_path) VALUES (:name, :path)");
+                $imgStmt->execute([':name'=> basename($newPath), ':path'=> $imageRelPath]);
+                
+                $imageId = $db->lastInsertId();
+            }else{
+                $errors['image'] = "Failed to upload new image";
+            }
+        }else{
+            $errors['image'] = "Invalid image file";
+        }
+    }
+    
     if($title && $subtitle && $report){
-        $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category WHERE post_id = :id");
-        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id]);
+        $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category, image_id = :image WHERE post_id = :id");
+        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id, ':image'=> $imageId]);
         header('Location: index.php');
         exit();
+    }
+
+    if($post['image_id']){
+        // get old umage path
+        $imgStmt = $db->prepare("SELECT image_path FROM images WHERE image_id = :id");
+        $imgStmt->execute([':id'=> $post['image_id']]);
+        
+        $oldImage = $imgStmt->fetch(PDO::FETCH_ASSOC);
+
+        // remove old image path
+        if($oldImage && file_exists($oldImage['image_path'])){
+            unlink($oldImage['image_path']);
+        }
+
+        $deleteImage = $db->prepare('DELETE * FROM images WHERE image_id = :id');
+        $deleteImage->execute([':id' => $post['image_id']]);
     }
 
     if (empty($title)) $errors['title'] = 'The title is required'; 
@@ -83,7 +165,7 @@ if(isset($_POST['update'])){
             <div class="edit-form">
                 <h2>Edit this post</h2>
 
-                <form action="" method="POST" id="editPostForm">
+                <form action="" method="POST" id="editPostForm" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="title">Title:</label>
                         <input type="text" id="title" name="title" value="<?= htmlspecialchars($post['title'], ENT_QUOTES | ENT_HTML5)?>" required>

@@ -59,7 +59,7 @@ if(!empty($selectedCategory)){
 }   
 
 // function to create resized images
-function createResizedImage($db, $imageId, $originalPath){
+function createResizedImages($db, $imageId, $originalPath){
     global $db;
 
     if(!$originalPath || !file_exists($originalPath)){
@@ -98,11 +98,48 @@ function createResizedImage($db, $imageId, $originalPath){
     }
 }
 
-// Function to get image path
-function getImagePath($db, $imageId, $originalPath){
+// Function to get thumbnail image path
+function getThumbnailPath($db, $imageId, $originalPath, $thumbnailPath){
+    // return existing path 
+    if(!empty($thumbnailPath) && file_exists($thumbnailPath)){
+        return $thumbnailPath;
+    }
+    
+    // return existing path 
+    if(empty($thumbnailPath) && !file_exists($thumbnailPath)){
+        return $originalPath;
+    }
+    
+    // if thumbnail image does not exist create one
+    $resized = createResizedImages($db, $imageId, $originalPath);
+    if($resized && is_array($resized) && isset($resized['thumbnail'])){
+        return $resized('thumbnail');
+    }
 
+    return $originalPath;
 }
 
+
+// Function to get fullsize image path
+function getfullsizePath($db, $imageId, $originalPath, $fullsizePath){
+    // return existing path
+    if(!empty($fullsizePath) && file_exists($fullsizePath)){
+        return $fullsizePath;
+    }
+    
+    // return existing path
+    if(empty($fullsizePath) && !file_exists($fullsizePath)){
+        return $originalPath;
+    }
+    
+    // if fullsize image does not exist create one
+    $resized = createResizedImages($db, $imageId, $originalPath);
+    if($resized && is_array($resized) && isset($resized['fullsize'])){
+        return $resized('fullsize');
+    }
+
+    return $originalPath;
+}
 
 ?>
 <!DOCTYPE html>
@@ -173,8 +210,11 @@ function getImagePath($db, $imageId, $originalPath){
                             </p>
                         </h3>
 
-                        <?php if(!empty($row['image_path'])): ?>
-                            <img src="<?= $row['image_path']?>" alt="<?= $row['image_name']?>">
+                        <?php if(!empty($row['image_id']) && !empty($row['image_path'])): ?>
+                            <?php
+                                $imagePath = getThumbnailPath($db, $row['image_id'], $row['image_path'], $row['thumbnail_path']); 
+                            ?>                                   
+                            <img src="<?= $imagePath?>" alt="<?= $row['image_name']?>" class="thumbnail">
                         <?php endif ?>
 
                         <p><?= htmlspecialchars($row['report'], ENT_QUOTES | ENT_HTML5)?></p>
