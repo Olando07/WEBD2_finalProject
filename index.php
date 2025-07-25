@@ -1,7 +1,6 @@
 <?php
-
-require('connect.php');
-include_once 'sessionHandler.php';
+require_once 'sessionHandler.php';
+require_once 'connect.php';
 requireLogin();
 
 // image resize library
@@ -118,7 +117,6 @@ function getThumbnailPath($db, $imageId, $originalPath, $thumbnailPath){
 
     return $originalPath;
 }
-
 
 // Function to get fullsize image path
 function getfullsizePath($db, $imageId, $originalPath, $fullsizePath){

@@ -1,13 +1,12 @@
 <?php
-
-require('connect.php');
-require_once('header.php');
-include_once 'sessionHandler.php';
+require_once 'sessionHandler.php';
+require_once 'connect.php';
 requireLogin(); // Make sure user is logged in
 
-$titleError = '';
-$subtitleError = '';
-$reportError = '';
+// image resize library
+require './php-image-resize-master/lib/ImageResize.php';
+require './php-image-resize-master/lib/ImageResizeException.php';
+
 $errors = ['title'=>'', 'subtitle'=>'', 'report'=>''];
 
 $stmt=$db->prepare("SELECT * FROM users WHERE username = :username");
@@ -109,6 +108,23 @@ if(isset($_POST['update'])){
 
         if (validFile($tempImagePath, $newPath)) {
             if(move_uploaded_file($tempImagePath, $newPath)){
+                // remove image
+                if($post['image_id']){
+                    // get old umage path
+                    $imgStmt = $db->prepare("SELECT image_path FROM images WHERE image_id = :id");
+                    $imgStmt->execute([':id'=> $post['image_id']]);
+                    
+                    $oldImage = $imgStmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    // remove old image path
+                    if($oldImage && file_exists($oldImage['image_path'])){
+                        unlink($oldImage['image_path']);
+                    }
+                    
+                    $deleteImage = $db->prepare('DELETE FROM images WHERE image_id = :id');
+                    $deleteImage->execute([':id' => $post['image_id']]);
+                }
+
                 // add image to database
                 $imgStmt = $db->prepare("INSERT INTO images (image_name, image_path) VALUES (:name, :path)");
                 $imgStmt->execute([':name'=> basename($newPath), ':path'=> $imageRelPath]);
@@ -125,25 +141,11 @@ if(isset($_POST['update'])){
     if($title && $subtitle && $report){
         $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category, image_id = :image WHERE post_id = :id");
         $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id, ':image'=> $imageId]);
+
         header('Location: index.php');
         exit();
     }
 
-    if($post['image_id']){
-        // get old umage path
-        $imgStmt = $db->prepare("SELECT image_path FROM images WHERE image_id = :id");
-        $imgStmt->execute([':id'=> $post['image_id']]);
-        
-        $oldImage = $imgStmt->fetch(PDO::FETCH_ASSOC);
-
-        // remove old image path
-        if($oldImage && file_exists($oldImage['image_path'])){
-            unlink($oldImage['image_path']);
-        }
-
-        $deleteImage = $db->prepare('DELETE * FROM images WHERE image_id = :id');
-        $deleteImage->execute([':id' => $post['image_id']]);
-    }
 
     if (empty($title)) $errors['title'] = 'The title is required'; 
     if (empty($subtitle)) $errors['subtitle'] = 'This subtitle is required'; 
@@ -157,10 +159,12 @@ if(isset($_POST['update'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="main.css">
     <title>Winnipeg News: Edit Post</title>
 </head>
 <body>
+    <?php require_once 'header.php'; ?>
     <div class="edit-main">
             <div class="edit-form">
                 <h2>Edit this post</h2>
@@ -190,7 +194,7 @@ if(isset($_POST['update'])){
                         <label for="image">Upload Image (Optional):</label>
                         <input type="file" id="image" name="image" accept='image/*'>
                         <small>Allowed formats: GIF, JPG, JPEG, PNG</small>
-                        <span class="error"><?= isset($errors['images']) ? $errors['images']: ''?></span>
+                        <span class="error"><?= isset($errors['image']) ? $errors['image']: ''?></span>
                     </div>
                     <div class="form-group">
                         <label for="report">Content</label>
@@ -219,7 +223,13 @@ if(isset($_POST['update'])){
                 </div>
             </div>
             
+            <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
             <script>
+                const quill = new Quill('#report-editor', {
+                    theme: 'snow',
+                    placeholder: 'Enter your report here'
+                });
+
                 function showDeleteOverlay() {
                     document.getElementById('deleteOverlay').style.display = 'flex';
                 }

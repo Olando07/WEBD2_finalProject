@@ -1,14 +1,17 @@
 <?php
-
-require('connect.php');
-require_once('header.php');
-include_once 'sessionHandler.php';
+require_once 'sessionHandler.php';
+require_once 'connect.php';
 requireLogin(); // Make sure user is logged in
+
+// image resize library
+require './php-image-resize-master/lib/ImageResize.php';
+require './php-image-resize-master/lib/ImageResizeException.php';
 
 $title = '';
 $subtitle = '';
-$report = '';
+$report = null;
 $category = '';
+$errors = [];
 
 function uploadPath($fileName, $uploadFolder = 'uploads'){
     $currentFolder = dirname(__FILE__);
@@ -50,7 +53,8 @@ if (!is_dir($uploadsDir)) {
 
 // Fetch categories
 try{
-    $stmt = $db->query("SELECT * FROM categories ORDER BY category_id");
+    $stmt = $db->prepare("SELECT * FROM categories ORDER BY category_id");
+    $stmt->execute();
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }catch(PDOException $e){
     $errors['general'] = "Errors loading categories:" . $e->getMessage();
@@ -58,17 +62,19 @@ try{
 }
 
 // checks if form is submitted
-if($_POST && !empty($_POST['create'])){
+if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
     // filter unsafe to preserve " and '
     $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
     $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
-    $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
+    if(isset($_POST['hidden-editor'])){
+        $report = $_POST['hidden-editor'];
+    }
 
     // validate required fields
     if (empty($title)) $errors['title'] = 'The title is required'; 
-    if (empty($subtitle)) $errors['subtitle'] = 'This subtitle is required'; 
-    if (empty($report)) $errors['report'] = 'This report is required'; 
+    if (empty($subtitle)) $errors['subtitle'] = 'The subtitle is required'; 
+    if (empty($report)) $errors['hidden-editor'] = 'The report is required'; 
     if (empty($category)) $errors['category'] = 'Please select a category';
 
     $imageId = null;
@@ -94,10 +100,6 @@ if($_POST && !empty($_POST['create'])){
         }
         // Check if file already exists and rename if necessary
         else {
-            $counter = 1;
-            $originalPath = $newPath;
-            $originalRelPath = $imageRelPath;
-            
             // Generate unique filename to avoid conflicts 
             $fileExtension = pathinfo($imageFileName, PATHINFO_EXTENSION);
             $uniqueFileName = time() . '_' . mt_rand(1000, 9999) . '.' . $fileExtension;
@@ -112,7 +114,7 @@ if($_POST && !empty($_POST['create'])){
                     
                     $imageId = $db->lastInsertId();
                 }catch(PDOException $e){
-                    $errors['image'] = "There was an errror in saving the image: " . $e->getMessage();
+                    $errors['image'] = "There was an error in saving the image: " . $e->getMessage();
                     // Clean up uploaded file if database insert fails
                     if (file_exists($newPath)) {
                         unlink($newPath);
@@ -130,7 +132,7 @@ if($_POST && !empty($_POST['create'])){
     if(empty($errors) && $title && $subtitle && $report){
         $posts = $db->prepare("INSERT INTO posts(title, subtitle, report, category_id, creator_id, image_id) VALUES(:title, :subtitle, :report, :category, :creator, :image_id)");
         // checks if there is an image or image error
-        if (!$uploadImage || isset($errors['images'])) {
+        if (!$uploadImage || isset($errors['image'])) {
             $imageId = null;
         }
 
@@ -147,10 +149,12 @@ if($_POST && !empty($_POST['create'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="main.css">
-    <title>Winnipeg News: Create a post</title>
+    <title>Create a post</title>
 </head>
 <body>
+    <?php require_once 'header.php'; ?>
     <div class="create-main">
         <div class="create-form">
             <h2>Create a post</h2>
@@ -172,9 +176,9 @@ if($_POST && !empty($_POST['create'])){
                 <div class="form-group">
                     <label for="category">Select a Category:</label>
                     <select name="category" id="category" size="8" required>
-                        <?php foreach($categories as $category): ?>
-                            <option value="<?= $category['category_id']?>" <?= isset($_POST['category_id']) && $_POST['category_id'] == $category['category_id'] ? 'selected' : ''?>>
-                                <?= $category['category_name']?>
+                        <?php foreach($categories as $cat): ?>
+                            <option value="<?= $cat['category_id']?>" <?= isset($_POST['category_id']) && $_POST['category_id'] == $cat['category_id'] ? 'selected' : ''?>>
+                                <?= $cat['category_name']?>
                             </option>
                         <?php endforeach ?>
                     </select>
@@ -185,20 +189,12 @@ if($_POST && !empty($_POST['create'])){
                     <small>Allowed formats: GIF, JPG, JPEG, PNG</small>
                     <span class="error"><?= isset($errors['images']) ? $errors['images']: ''?></span>
                 </div>
-
-                <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-                <div class="form-group" id="report-textarea">
-                    <label for="report"></label>
-                    <span class="error"><?= isset($errors['report']) ? $errors['report']: ''?></span>
+                <div class="form-group">
+                    <p>Report:</p>
+                    <div name="editor" id="editor" value="<?= isset($_POST['hidden-editor']) ? $_POST['hidden-editor'] : ''?>"></div>
+                    <input type="hidden" name="hidden-editor" id="hidden-editor" value="<?= isset($_POST['hidden-editor']) ? $_POST['hidden-editor'] : ''?>">
+                    <span class="error"><?= isset($errors['hidden-editor']) ? $errors['hidden-editor']: ''?></span>
                 </div>
-
-                <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-                <script>
-                const quill = new Quill('#report-textarea', {
-                    theme: 'snow',
-                });
-                </script>
-
                 <div class="form-actions">
                     <input type="submit" name="create" value="Create Post" class="create-btn">
                     <a href="index.php" class="cancel-btn">cancel</a>
@@ -206,6 +202,49 @@ if($_POST && !empty($_POST['create'])){
             </form>
         </div>
     </div>
-
 </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const toolbarOptions = [
+                ['bold', 'italic', 'underline', 'strike'],  
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }], 
+                [{ 'indent': '-1'}, { 'indent': '+1' }],    
+                ['clean']  
+            
+            ];
+            const quill = new Quill('#editor', {
+                placeholder: 'Enter your report here',
+                theme: 'snow',
+                modules: { toolbar: toolbarOptions }
+            });
+            
+            let currentReport = '';
+            // Load previosuly entered input
+            let prevData = document.getElementById('hidden-editor').value;
+            if(!prevData.trim() == ''){
+                quill.root.innerHTML = prevData;
+                currentReport = prevData;
+            }
+
+            // Update hidden input when changed 
+            quill.on('text-change', function(){
+                report = quill.root.innerHTML;
+                document.getElementById('hidden-editor').value = report;
+            });
+            
+            // get content and submit form
+            // retrieves user input and adds it to hidden input
+            document.getElementById('createPostForm').addEventListener('submit', function(e){
+                e.preventDefault();
+                document.getElementById('hidden-input').value = currentReport;
+            
+                e.target.submit;
+            });
+
+        })
+    </script>
+
 </html>

@@ -1,18 +1,41 @@
 <?php
+require_once 'sessionHandler.php';
+require_once 'connect.php';
 
-include_once 'sessionHandler.php';
+$userId = $_SESSION['user_id'] ?? '';
+$userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
 
-$userSearch = $_GET['search-bar'] ?? '';
-
+// only update searchbar if new item is provided
 if(isset($_GET['search-bar']) && !empty($_GET['search-bar'])) {
     $_SESSION['last_search'] = $_GET['search-bar'];
 }
 
 $userSearch = $_GET['search-bar'] ?? $_SESSION['last_search'] ?? '';
 
-$userId = $_SESSION['user_id'];
-$user = $db->query("SELECT * FROM users WHERE user_id = '$userId'");
-$userinfo = $user->fetch(PDO::FETCH_ASSOC);
+$loggedIn = false;
+$isAdmin = false;
+$displayUser = 'Guest';
+$userinfo = null;
+
+if(isset($_SESSION['user_id'])){
+    $userId = $_SESSION['user_id'];
+    try{
+        $user = $db->prepare("SELECT * FROM users WHERE user_id = :user_id");
+        $user->execute([':user_id'=>$userId]);
+        $userinfo = $user->fetch(PDO::FETCH_ASSOC);
+
+        if($userinfo){
+            $loggedIn = true;
+            $displayUser = $userinfo['username'];
+            if($userinfo['is_admin'] == 1){
+                $isAdmin = true;
+            }
+        }
+    }catch(PDOException $e){
+        error_log('Error fetching user: ' . $e->getMessage());
+        $userinfo = null;
+    }
+}
 
 ?>
 
@@ -34,11 +57,11 @@ $userinfo = $user->fetch(PDO::FETCH_ASSOC);
             <a href="index.php" id="homepage">Home</a>
 
             <!-- Link to create page -->
-            <?php if($userinfo['is_admin'] == 1): ?>
+            <?php if($isAdmin): ?>
                 <a href="create.php" id="createpost">Create</a>
             <?php endif ?>
 
-            <a href="index.php" id="userInfo"><?= $userinfo['username']?></a>
+            <a href="index.php" id="userInfo"><?= $displayUser?></a>
 
             <!-- Log out button -->
             <a href="index.php?action=logout" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>

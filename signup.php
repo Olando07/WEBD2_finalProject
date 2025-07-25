@@ -1,6 +1,6 @@
 <?php
 
-require('connect.php');
+require_once('connect.php');
 $fNameError = null;
 $lNameError = null;
 $ageError = null;
@@ -9,6 +9,7 @@ $usernameError = null;
 $passwordError = null;
 $passwordConfirmError = null;
 $noError = true;
+$duplicateError = '';
 $accountCreated = false;
 
 $fName = null;
@@ -37,7 +38,7 @@ if($_POST && !empty($_POST['signup'])){
         $noError = false;
     }
     
-    if(empty($_POST['email'])){
+    if(empty($_POST['email']) || filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)){
         $emailError = "Please enter your email.";
         $noError = false;
     }
@@ -70,6 +71,15 @@ if($_POST && !empty($_POST['signup'])){
     $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
     $password = $_POST['password']; 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Check if user name or email is being used already
+    $duplicateCheck = $db->prepare("SELECT COUNT(*) FROM posts WHERE username = :username OR email = :email");
+    $duplicateCheck->execute([':username'=>$username, ':email'=>$email]);
+
+    if($duplicateCheck->fetchColumn() > 0){
+        $duplicateError = "The username or email is being used already";
+        $noError = false;
+    }
 
     if($noError){
         $user->execute([':username'=>$username, ':password'=>$hashedPassword, ':firstName'=>$fName, ':lastName'=>$lName, ':age'=>$age, ':email'=>$email]);
@@ -119,20 +129,22 @@ if($_POST && !empty($_POST['signup'])){
                         <label for="username">Email:</label>
                         <input type="text" name="email" id="email" placeholder="Email" value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']): '' ?>">
                         <p class="error"><?= $emailError?></p>
+                        <p class="error"><?= $duplicateError?></p>
                     </div>
                     <div class="input-fields">
                         <label for="username">Username:</label>
                         <input type="text" name="username" id="username" placeholder="Username" value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']): '' ?>">
                         <p class="error"><?= $usernameError?></p>
+                        <p class="error"><?= $duplicateError?></p>
                     </div>
                     <div class="input-fields">
                         <label for="password">Password:</label>
-                        <input type="password" name="password" id="password" placeholder="Password" value="<?= isset($_POST['password']) ? htmlspecialchars($_POST['password']): '' ?>">
+                        <input type="password" name="password" id="password" placeholder="Password">
                         <p class="error"><?= $passwordError?></p>
                     </div>
                     <div class="input-fields">
                         <label for="password">Reenter password:</label>
-                        <input type="password" name="password-confirm" id="password-confirm" placeholder="Password" value="<?= isset($_POST['password-confirm']) ? htmlspecialchars($_POST['password']): '' ?>">
+                        <input type="password" name="password-confirm" id="password-confirm" placeholder="Password">
                         <p class="error"><?= $passwordConfirmError?></p>
                     </div>
                     <?php if($accountCreated):?>

@@ -441,14 +441,15 @@ html {
 /* Start of Fullpost styles*/
 .comments-page {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
     height: 100dvh;
+    place-self: center;
+    margin-top: 80px;
 }
 
 .comments-page .posts {
     padding: 10px 25px 30px;
-    margin-top: 200px;
 }
 
 .comments-page .posts h3 {
@@ -516,12 +517,20 @@ html {
     gap: 20px;
 }
 
+.create-main .create-form form .form-group #editor {
+    min-height: 200px;
+}
+
 .edit-main .edit-form form .form-group, .create-main .create-form form .form-group {
     gap: 10px;
 }
 
 .edit-main .edit-form form .form-group label, .create-main .create-form form .form-group label {
     font-size: 18px;
+}
+
+.create-main .create-form form .form-group p {
+    font-size: 17px;
 }
 
 .edit-main .edit-form form .form-group input, .create-main .create-form form .form-group input {

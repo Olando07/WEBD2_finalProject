@@ -1,10 +1,9 @@
 <?php
+include_once 'sessionHandler.php';
+require_once('connect.php');
 
 // admin account pass: greatnesswithGod
 // regular account pass: itisnotclockingtoyou
-
-require('connect.php');
-include_once 'sessionHandler.php';
 
 $userNameError = null;
 $passwordError = null;
@@ -26,25 +25,22 @@ if($_POST && !empty($_POST['login'])){
 
         $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
         $stmt->execute([':username'=>$username]);
-        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
-        $stmt->execute([':username'=>$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($user && password_verify($password, $user['password'])){
-            if(!$user){
-                $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
-            }else if(!password_verify($password, $user['password'])){
-                $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
-            }else{
-                $loggedIn = true;
+            $loggedIn = true;
 
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['logged_in'] = true;
-
-                // header('Location: index.php');
-                // exit();
-            }
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['logged_in'] = true;
+        }
+        
+        if(!$user){
+            $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
+        }
+        
+        if(!password_verify($password, $user['password'])){
+            $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
         }
     }
 }
