@@ -67,9 +67,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
     $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
     $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
-    if(isset($_POST['hidden-editor'])){
-        $report = $_POST['hidden-editor'];
-    }
+    $report = filter_input(INPUT_POST, 'hidden-editor', FILTER_UNSAFE_RAW);
 
     // validate required fields
     if (empty($title)) $errors['title'] = 'The title is required'; 
@@ -187,12 +185,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
                     <label for="image">Upload Image (Optional):</label>
                     <input type="file" id="image" name="image" accept='image/*'>
                     <small>Allowed formats: GIF, JPG, JPEG, PNG</small>
-                    <span class="error"><?= isset($errors['images']) ? $errors['images']: ''?></span>
+                    <span class="error"><?= isset($errors['image']) ? $errors['image']: ''?></span>
                 </div>
                 <div class="form-group">
                     <p>Report:</p>
-                    <div name="editor" id="editor" value="<?= isset($_POST['hidden-editor']) ? $_POST['hidden-editor'] : ''?>"></div>
-                    <input type="hidden" name="hidden-editor" id="hidden-editor" value="<?= isset($_POST['hidden-editor']) ? $_POST['hidden-editor'] : ''?>">
+                    <div name="editor" id="editor"></div>
+                    <input type="hidden" name="hidden-editor" id="hidden-editor" value="<?= isset($report) ? htmlspecialchars($report) : ''?>">
                     <span class="error"><?= isset($errors['hidden-editor']) ? $errors['hidden-editor']: ''?></span>
                 </div>
                 <div class="form-actions">
@@ -224,27 +222,28 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
             let currentReport = '';
             // Load previosuly entered input
             let prevData = document.getElementById('hidden-editor').value;
+
             if(!prevData.trim() == ''){
                 quill.root.innerHTML = prevData;
                 currentReport = prevData;
-            }
+            };
 
             // Update hidden input when changed 
             quill.on('text-change', function(){
-                report = quill.root.innerHTML;
-                document.getElementById('hidden-editor').value = report;
+                currentReport = quill.root.innerHTML;
+                document.getElementById('hidden-editor').value = currentReport;
             });
             
             // get content and submit form
             // retrieves user input and adds it to hidden input
             document.getElementById('createPostForm').addEventListener('submit', function(e){
                 e.preventDefault();
-                document.getElementById('hidden-input').value = currentReport;
-            
-                e.target.submit;
+                document.getElementById('hidden-editor').value = currentReport;
+                return false;
             });
 
-        })
+            return true;
+        });
     </script>
 
 </html>
