@@ -249,9 +249,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
             
             let currentReport = '';
             let prevData = document.getElementById('hidden-editor').value;
+            let postContent = <?= json_encode($post['report'] ?? '')?>
             // Load previosuly entered input
             if(prevData || prevData.trim() !== ''){
                 quill.root.innerHTML = prevData;
+            }else{
+                quill.root.innerHTML = postContent;
+                document.getElementById('hidden-editor').value = postContent;
             }
 
             // Update hidden input when changed 
@@ -261,45 +265,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
             
             // handle input and form submission
             // retrieves user input and adds it to hidden input
-            document.getElementById('createPostForm').addEventListener('submit', function(e){
-                // update hidden input
-                document.getElementById('hidden-editor').value = quill.root.innerHTML;
-
-                // Check if there is content
-                let textContent = quill.getText().trim();
-                if(!textContent || textContent === 0){
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        })
-    </script>
-            document.getElementById('createPostForm').addEventListener('submit', function(e){
-                // update hidden input
-                document.getElementById('hidden-editor').value = quill.root.innerHTML;
-
-                // Check if there is content
-                let textContent = quill.getText().trim();
-                if(!textContent || textContent === 0){
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        })
-    </script>
-            document.getElementById('createPostForm').addEventListener('submit', function(e){
-                // update hidden input
-                document.getElementById('hidden-editor').value = quill.root.innerHTML;
-
-                // Check if there is content
-                let textContent = quill.getText().trim();
-                if(!textContent || textContent === 0){
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        })
-    </script>
             document.getElementById('createPostForm').addEventListener('submit', function(e){
                 // update hidden input
                 document.getElementById('hidden-editor').value = quill.root.innerHTML;

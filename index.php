@@ -128,8 +128,10 @@ if(!empty($selectedCategory)){
                         <div class="post-bottom">
                             <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
                         </div>
-                        <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
-                        <p class="date"><?= date_format(new DateTime($row['updated_at']), "F d Y h:i a") ?></p>
+                        <div class="date_div">
+                            <p class="date">Created on: <?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
+                            <p class="update_date">Last Updated on: <?= date_format(new DateTime($row['updated_at']), "F d Y h:i a") ?></p>
+                        </div>
                         <!-- TODO: show date when post was last update -->
                     </div>
                 <?php endif?>
