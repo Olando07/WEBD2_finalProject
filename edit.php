@@ -183,6 +183,9 @@ if(isset($_POST['update'])){
                     <div class="form-group">
                         <label for="category">Select a Category:</label>
                         <select name="category" id="category" size="8" required>
+                            <option value="" id="placeholder">
+                                Select a category
+                            </option>
                             <?php foreach($categories as $category): ?>
                                 <option value="<?= $category['category_id']?>" <?= $category['category_id'] == $post['category_id'] ? 'selected' : ''?>>
                                     <?= $category['category_name']?>

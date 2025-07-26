@@ -158,7 +158,7 @@ function getfullsizePath($db, $imageId, $originalPath, $fullsizePath){
                     <!-- Categories users can select -->
                      <select name="category" id="category">
                         <option value="placeholder" id="placeholder">
-                            All categories
+                            Select a category
                         </option>
                          <?php foreach($categories as $category): ?>
                              <option value="<?= $category['category_id']?>" <?= $selectedCategory == $category['category_id'] ? 'selected' : ''?>>
@@ -215,7 +215,7 @@ function getfullsizePath($db, $imageId, $originalPath, $fullsizePath){
                             <img src="<?= $imagePath?>" alt="<?= $row['image_name']?>" class="thumbnail">
                         <?php endif ?>
 
-                        <p><?= htmlspecialchars($row['report'], ENT_QUOTES | ENT_HTML5)?></p>
+                        <p><?= $row['report']?></p>
                         <div class="post-bottom">
                             <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
                             <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>

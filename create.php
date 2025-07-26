@@ -13,12 +13,12 @@ $report = null;
 $category = '';
 $errors = [];
 
-function uploadPath($fileName, $uploadFolder = 'uploads'){
-    $currentFolder = dirname(__FILE__);
-    $path = [$currentFolder, $uploadFolder, basename($fileName)];
+// function uploadPath($fileName, $uploadFolder = 'uploads'){
+//     $currentFolder = dirname(__FILE__);
+//     $path = [$currentFolder, $uploadFolder, basename($fileName)];
     
-    return join(DIRECTORY_SEPARATOR, $path);
-}
+//     return join(DIRECTORY_SEPARATOR, $path);
+// }
 
 function validFile($tempPath, $newPath){
     $validFileTypes = ['gif', 'jpg', 'jpeg', 'png'];
@@ -44,12 +44,12 @@ function validFile($tempPath, $newPath){
 }
 
 // Create uploads directory if it doesn't exist
-$uploadsDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uploads';
-if (!is_dir($uploadsDir)) {
-    if (!mkdir($uploadsDir, 0755, true)) {
-        $errors['general'] = "Could not create uploads directory";
-    }
-}
+// $uploadsDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uploads';
+// if (!is_dir($uploadsDir)) {
+//     if (!mkdir($uploadsDir, 0755, true)) {
+//         $errors['general'] = "Could not create uploads directory";
+//     }
+// }
 
 // Fetch categories
 try{
@@ -62,14 +62,12 @@ try{
 }
 
 // checks if form is submitted
-if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
     // filter unsafe to preserve " and '
     $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
     $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
-    if(isset($_POST['hidden-editor'])){
-        $report = $_POST['hidden-editor'];
-    }
+    $report = filter_input(INPUT_POST, 'hidden-editor', FILTER_UNSAFE_RAW);
 
     // validate required fields
     if (empty($title)) $errors['title'] = 'The title is required'; 
@@ -80,17 +78,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
     $imageId = null;
 
     // handle image upload
-    $uploadImage = isset($_FILES['image']) && ($_FILES['image']['error'] === 0);
-    $uploadError = isset($_FILES['image']) && ($_FILES['image']['error'] > 0);
-    $imageFileName = '';
+    // $uploadImage = isset($_FILES['image']) && ($_FILES['image']['error'] === 0);
+    // $uploadError = isset($_FILES['image']) && ($_FILES['image']['error'] > 0);
+    // $imageFileName = '';
 
     // checks if image is uploaded
     if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
         // filename sanitization
         $imageFileName = preg_replace('/[^a-zA-Z0-9._-]/', '',basename($_FILES['image']['name']));
         $tempImagePath = $_FILES['image']['tmp_name'];
-        $newPath = uploadPath($imageFileName);
-        $imageRelPath = 'uploads/' . $imageFileName;
+        // $newPath = uploadPath($imageFileName);
+        // $imageRelPath = 'uploads/' . $imageFileName;
 
         // Check file size (limit to 5MB)
         if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
@@ -103,10 +101,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
             // Generate unique filename to avoid conflicts 
             $fileExtension = pathinfo($imageFileName, PATHINFO_EXTENSION);
             $uniqueFileName = time() . '_' . mt_rand(1000, 9999) . '.' . $fileExtension;
-            $newPath = uploadPath($uniqueFileName);
-            $imageRelPath = 'uploads/' . $uniqueFileName;
+            // $newPath = uploadPath($uniqueFileName);
+            // $imageRelPath = 'uploads/' . $uniqueFileName;
 
-            if(move_uploaded_file($tempImagePath, $newPath)){
+            // if(move_uploaded_file($tempImagePath, $newPath)){
                 try{
                     // add image to database
                     $imgStmt = $db->prepare("INSERT INTO images (image_name, image_path) VALUES (:name, :path)");
@@ -120,26 +118,37 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
                         unlink($newPath);
                     }
                 } 
-            }else{
-                $errors['image'] = "Failed to upload image. Check directory permissions.";
-            }
+            // }else{
+            //     $errors['image'] = "Failed to upload image. Check directory permissions.";
+            // }
         }     
-    }elseif($uploadError){
+    }elseif(isset($_FILES['image']) && $_FILES['image']['error'] > 0 && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE){
         $errors['image'] = 'Error uploading file';
     }
     
     // proceed if there are no validation errors
-    if(empty($errors) && $title && $subtitle && $report){
+    if(empty($errors) && !empty($title) && !empty($subtitle) && !empty($report)){
+        echo "<pre>ATTEMPTING DATABASE INSERT</pre>";
         $posts = $db->prepare("INSERT INTO posts(title, subtitle, report, category_id, creator_id, image_id) VALUES(:title, :subtitle, :report, :category, :creator, :image_id)");
         // checks if there is an image or image error
         if (!$uploadImage || isset($errors['image'])) {
             $imageId = null;
         }
 
-        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id'], ':image_id'=>$imageId]);
+        try {
+            $result = $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id'], ':image_id'=>$imageId]);
 
-        header('Location: index.php');
-        exit();
+            if($result){
+                header('Location: index.php');
+                exit();
+            }else{
+                $errors['general'] = "Failed to create post. Try again";
+            }
+        }catch(PDOException $e){
+            $errors['general'] = "Database error: " . $e->getMessage();
+        }
+
+
     }
 }
 
@@ -176,8 +185,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
                 <div class="form-group">
                     <label for="category">Select a Category:</label>
                     <select name="category" id="category" size="8" required>
+                        <option value="" id="placeholder">
+                            Select a category
+                        </option>
                         <?php foreach($categories as $cat): ?>
-                            <option value="<?= $cat['category_id']?>" <?= isset($_POST['category_id']) && $_POST['category_id'] == $cat['category_id'] ? 'selected' : ''?>>
+                            <option value="<?= $cat['category_id']?>" <?= isset($_POST['category']) && $_POST['category'] == $cat['category_id'] ? 'selected' : ''?>>
                                 <?= $cat['category_name']?>
                             </option>
                         <?php endforeach ?>
@@ -187,7 +199,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
                     <label for="image">Upload Image (Optional):</label>
                     <input type="file" id="image" name="image" accept='image/*'>
                     <small>Allowed formats: GIF, JPG, JPEG, PNG</small>
-                    <span class="error"><?= isset($errors['images']) ? $errors['images']: ''?></span>
+                    <span class="error"><?= isset($errors['image']) ? $errors['image']: ''?></span>
                 </div>
                 <div class="form-group">
                     <p>Report:</p>
@@ -222,28 +234,30 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create'])){
             });
             
             let currentReport = '';
-            // Load previosuly entered input
             let prevData = document.getElementById('hidden-editor').value;
-            if(!prevData.trim() == ''){
+            // Load previosuly entered input
+            if(prevData || prevData.trim() !== ''){
                 quill.root.innerHTML = prevData;
-                currentReport = prevData;
             }
 
             // Update hidden input when changed 
             quill.on('text-change', function(){
-                report = quill.root.innerHTML;
-                document.getElementById('hidden-editor').value = report;
+                document.getElementById('hidden-editor').value = quill.root.innerHTML;
             });
             
-            // get content and submit form
+            // handle input and form submission
             // retrieves user input and adds it to hidden input
             document.getElementById('createPostForm').addEventListener('submit', function(e){
-                e.preventDefault();
-                document.getElementById('hidden-input').value = currentReport;
-            
-                e.target.submit;
-            });
+                // update hidden input
+                document.getElementById('hidden-editor').value = quill.root.innerHTML;
 
+                // Check if there is content
+                let textContent = quill.getText().trim();
+                if(!textContent || textContent === 0){
+                    e.preventDefault();
+                    return false;
+                }
+            });
         })
     </script>
 
