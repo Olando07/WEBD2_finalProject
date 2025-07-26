@@ -3,10 +3,6 @@ require_once 'sessionHandler.php';
 require_once 'connect.php';
 requireLogin();
 
-// image resize library
-require './php-image-resize-master/lib/ImageResize.php';
-require './php-image-resize-master/lib/ImageResizeException.php';
-
 // Logout handle
 if(isset($_GET['action']) && $_GET['action'] === 'logout'){
     $_SESSION = array();
@@ -34,110 +30,28 @@ $editBtn = null;
 if(!empty($selectedCategory)){
     if($_GET['search-bar']){
         // Both category filter and search 
-        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? AND p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? AND p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
         $posts=$stmt;
         $posts->execute([$selectedCategory, $searchPattern]); 
     }else{
         // Category filter only
-        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $posts=$stmt;
         $posts->execute([$selectedCategory]);      
     }
 }else{
     if(isset($_GET['search-btn']) && $_GET['search-bar']){
         // Search only 
-        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
         $posts = $stmt;
         $posts->execute([$searchPattern]);
     }else{
         // No category filter or search
-        $posts=$db->query("SELECT p.*, c.category_name, i.image_name, i.image_path, i.thumbnail_path, i.fullsize_path FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $posts=$db->query("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id ORDER BY p.time_created DESC, p.title, p.subtitle");
     }
 }   
-
-// function to create resized images
-function createResizedImages($db, $imageId, $originalPath){
-    global $db;
-
-    if(!$originalPath || !file_exists($originalPath)){
-        return false;
-    }
-
-    try{
-        // get file info
-        $pathInfo = pathinfo($originalPath);
-        $fileName = $pathInfo['filename'];
-        $extension = $pathInfo['extension'];
-        $directory =$pathInfo['dirname'];
-
-        $thumbnailPath = $directory . '/' . $fileName . '_thumb.' . $extension;
-        if(!file_exists($thumbnailPath)){
-            $image = new Gumlet\ImageResize($originalPath);
-            $image->resizeToBestFit(300, 200);
-            $image->save($thumbnailPath);
-        }
-        
-        $fullsizePath = $directory . '/' . $fileName . '_full.' . $extension;
-        if(!file_exists($fullsizePath)){
-            $image = new Gumlet\ImageResize($originalPath);
-            $image->resizeToBestFit(800, 600);
-            $image->save($fullsizePath);
-        }
-        
-        $stmt = $db->prepare('UPDATE images SET thumbnail_path = ?, fullsize_path = ? WHERE image_id = ?');
-        $stmt->execute([$thumbnailPath, $fullsizePath, $imageId]);
-
-        return ['thumbnail'=>$thumbnailPath, 'fullsize'=>$fullsizePath];
-
-    }catch(Exception $e){
-        error_log("Image resize error: " . $e->getMessage());
-        return false;
-    }
-}
-
-// Function to get thumbnail image path
-function getThumbnailPath($db, $imageId, $originalPath, $thumbnailPath){
-    // return existing path 
-    if(!empty($thumbnailPath) && file_exists($thumbnailPath)){
-        return $thumbnailPath;
-    }
-    
-    // return existing path 
-    if(empty($thumbnailPath) && !file_exists($thumbnailPath)){
-        return $originalPath;
-    }
-    
-    // if thumbnail image does not exist create one
-    $resized = createResizedImages($db, $imageId, $originalPath);
-    if($resized && is_array($resized) && isset($resized['thumbnail'])){
-        return $resized('thumbnail');
-    }
-
-    return $originalPath;
-}
-
-// Function to get fullsize image path
-function getfullsizePath($db, $imageId, $originalPath, $fullsizePath){
-    // return existing path
-    if(!empty($fullsizePath) && file_exists($fullsizePath)){
-        return $fullsizePath;
-    }
-    
-    // return existing path
-    if(empty($fullsizePath) && !file_exists($fullsizePath)){
-        return $originalPath;
-    }
-    
-    // if fullsize image does not exist create one
-    $resized = createResizedImages($db, $imageId, $originalPath);
-    if($resized && is_array($resized) && isset($resized['fullsize'])){
-        return $resized('fullsize');
-    }
-
-    return $originalPath;
-}
 
 ?>
 <!DOCTYPE html>
@@ -210,7 +124,7 @@ function getfullsizePath($db, $imageId, $originalPath, $fullsizePath){
 
                         <?php if(!empty($row['image_id']) && !empty($row['image_path'])): ?>
                             <?php
-                                $imagePath = getThumbnailPath($db, $row['image_id'], $row['image_path'], $row['thumbnail_path']); 
+                                 
                             ?>                                   
                             <img src="<?= $imagePath?>" alt="<?= $row['image_name']?>" class="thumbnail">
                         <?php endif ?>

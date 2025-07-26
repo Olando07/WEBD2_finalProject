@@ -3,10 +3,6 @@ require_once 'sessionHandler.php';
 require_once 'connect.php';
 requireLogin(); // Make sure user is logged in
 
-// image resize library
-require './php-image-resize-master/lib/ImageResize.php';
-require './php-image-resize-master/lib/ImageResizeException.php';
-
 $errors = ['title'=>'', 'subtitle'=>'', 'report'=>''];
 
 $stmt=$db->prepare("SELECT * FROM users WHERE username = :username");
@@ -26,24 +22,23 @@ if(!(int)$post_id){
     exit();
 }
 
-$categoryQuery = $db->query('SELECT * FROM categories');
-$categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
-
-// get post to edit
-$posts = $db->prepare("SELECT * FROM posts WHERE post_id = :id");
-$posts->execute([':id'=>$post_id]);
-$post = $posts->fetch(PDO::FETCH_ASSOC);
-
-if(!$post){
-    header('Location: index.php');
-    exit();
+// get categories
+try{
+    $stmt = $db->prepare("SELECT * FROM categories ORDER BY category_id");
+    $stmt->execute();
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}catch(PDOException $e){
+    $errors['general'] = "Errors loading categories: " . $e->getMessage();
+    $categories = [];
 }
 
-function uploadPath($fileName, $uploadFolder = 'uploads'){
-    $currentFolder = dirname(__FILE__);
-    $path = [$currentFolder, $uploadFolder, basename($fileName)];
-    
-    return join(DIRECTORY_SEPARATOR, $path);
+// get post to edit
+try{
+    $posts = $db->prepare("SELECT * FROM posts WHERE post_id = :id");
+    $posts->execute([':id'=>$post_id]);
+    $post = $posts->fetch(PDO::FETCH_ASSOC);
+}catch(PDOException $e){
+    $errors['general'] = "Error fetching post: " . $e->getMessage();
 }
 
 function validFile($tempPath, $newPath){
@@ -69,14 +64,6 @@ function validFile($tempPath, $newPath){
     return $isValidFileType && $isValidMimeType;
 }
 
-// Create uploads directory if it doesn't exist
-$uploadsDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uploads';
-if (!is_dir($uploadsDir)) {
-    if (!mkdir($uploadsDir, 0755, true)) {
-        $errors['general'] = "Could not create uploads directory";
-    }
-}
-
 // form submission
 // delete post
 if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'true'){
@@ -93,6 +80,12 @@ if(isset($_POST['update'])){
     $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
     
+    // validate required fields
+    if (empty($title)) $errors['title'] = 'The title is required'; 
+    if (empty($subtitle)) $errors['subtitle'] = 'The subtitle is required'; 
+    if (empty($report)) $errors['hidden-editor'] = 'The report is required'; 
+    if (empty($category)) $errors['category'] = 'Please select a category';
+
     // keep old image id as a default
     $imageId = $post['image_id'];
 
@@ -101,55 +94,103 @@ if(isset($_POST['update'])){
         // filename sanitization
         $imageFileName = preg_replace('/[^a-zA-Z0-9._-]/', '',basename($_FILES['image']['name']));
         $tempImagePath = $_FILES['image']['tmp_name'];
-        $fileExtension = pathinfo($imageFileName, PATHINFO_EXTENSION);
-        $uniqueFileName = time() . '_' . mt_rand(1000, 9999) . '.' . $fileExtension;
-        $newPath = uploadPath($uniqueFileName);
-        $imageRelPath = 'uploads/' . $uniqueFileName;
 
-        if (validFile($tempImagePath, $newPath)) {
-            if(move_uploaded_file($tempImagePath, $newPath)){
-                // remove image
-                if($post['image_id']){
-                    // get old umage path
-                    $imgStmt = $db->prepare("SELECT image_path FROM images WHERE image_id = :id");
-                    $imgStmt->execute([':id'=> $post['image_id']]);
-                    
-                    $oldImage = $imgStmt->fetch(PDO::FETCH_ASSOC);
-                    
-                    // remove old image path
-                    if($oldImage && file_exists($oldImage['image_path'])){
-                        unlink($oldImage['image_path']);
-                    }
-                    
-                    $deleteImage = $db->prepare('DELETE FROM images WHERE image_id = :id');
-                    $deleteImage->execute([':id' => $post['image_id']]);
+        // Check file size (limit to 5MB)
+        if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+            $errors['image'] = "File size too large. Maximum 5MB allowed.";
+        }elseif (!validFile($tempImagePath, $imageFileName)) {
+            $errors['image'] = "Invalid file type. Only GIF, PNG, JPG and JPEG files are allowed.";
+        }else{
+            $fileExtension = pathinfo($imageFileName, PATHINFO_EXTENSION);
+            $uniqueFileName = time() . '_' . mt_rand(1000, 9999) . '.' . $fileExtension;
+            try{
+                // get original image info
+                $imageInfo = getimagesize($tempImagePath);
+                $imageWidth = $imageInfo[0];
+                $imageHeight = $imageInfo[1];
+                $imageType = $imageInfo[2];
+                
+                // set max dimensions
+                $maxWidth = 800;
+                $maxHeight = 600;
+
+                // calculate new dimensions
+                $ratio = min($maxWidth/$imageWidth, $maxHeight/$imageHeight);
+                $newWidth = (int)($imageWidth * $ratio);
+                $newHeight = (int)($imageHeight * $ratio);
+
+                switch($imageType) {
+                    case IMAGETYPE_JPEG:
+                        $sourceImage = imagecreatefromjpeg($tempImagePath);
+                        break;
+                    case IMAGETYPE_PNG:
+                        $sourceImage = imagecreatefrompng($tempImagePath);
+                        break;
+                    case IMAGETYPE_GIF:
+                        $sourceImage = imagecreatefromgif($tempImagePath);
+                        break;
+                    default:
+                        throw new Exception("Your image is not supported. Sorry");
                 }
 
-                // add image to database
-                $imgStmt = $db->prepare("INSERT INTO images (image_name, image_path) VALUES (:name, :path)");
-                $imgStmt->execute([':name'=> basename($newPath), ':path'=> $imageRelPath]);
-                
+                // create image with resized dimensions
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+                // resized image
+                imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $imageWidth, $imageHeight);
+
+                // capture resized image data
+                ob_start();
+                switch($imageType) {
+                    case IMAGETYPE_JPEG:
+                        imagejpeg($resizedImage, null, 85);
+                        break;
+                    case IMAGETYPE_PNG:
+                        imagepng($resizedImage);
+                        break;
+                    case IMAGETYPE_GIF:
+                        imagegif($resizedImage);
+                        break;
+                }
+                $resizedImageData = ob_get_contents();
+                ob_end_clean();
+
+                // clear memory
+                imagedestroy($sourceImage);
+                imagedestroy($resizedImage);
+
+                // save resized image to database
+                $imgStmt = $db->prepare("INSERT INTO images (image_name, image_data) VALUES (:name, :data)");
+                $imgStmt->execute([':name'=> basename($uniqueFileName), ':data'=> $resizedImageData]);
+
                 $imageId = $db->lastInsertId();
-            }else{
-                $errors['image'] = "Failed to upload new image";
-            }
-        }else{
-            $errors['image'] = "Invalid image file";
-        }
+
+            }catch(Exception $e){
+                $errors['image'] = "There was an error processing the image: " . $e->getMessage();
+            }catch(PDOException $e){
+                $errors['image'] = "There was an error saving the image: " . $e->getMessage();
+            } 
+        }    
+    }elseif(isset($_FILES['image']) && $_FILES['image']['error'] > 0 && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE){
+        $errors['image'] = 'Error uploading file';
     }
     
-    if($title && $subtitle && $report){
+    if(empty($errors) && !empty($title) && !empty($subtitle) && !empty($report)){
         $posts = $db->prepare("UPDATE posts SET title = :title, subtitle = :subtitle, report = :report, category_id = :category, image_id = :image WHERE post_id = :id");
-        $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id, ':image'=> $imageId]);
+        $result = $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':id'=>$post_id, ':image'=> $imageId]);
 
-        header('Location: index.php');
-        exit();
+        try {
+            if($result){
+    // TODO: find out why database updates but page does not reroute
+                header('Location: index.php');
+                exit();
+            }else{
+                $errors['general'] = "Failed to create post. Try again";
+            }
+        }catch(PDOException $e){
+            $errors['general'] = "Database error: " . $e->getMessage();
+        }
     }
-
-
-    if (empty($title)) $errors['title'] = 'The title is required'; 
-    if (empty($subtitle)) $errors['subtitle'] = 'This subtitle is required'; 
-    if (empty($report)) $errors['report'] = 'This report is required'; 
 }
 
 ?>

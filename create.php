@@ -3,22 +3,11 @@ require_once 'sessionHandler.php';
 require_once 'connect.php';
 requireLogin(); // Make sure user is logged in
 
-// image resize library
-require './php-image-resize-master/lib/ImageResize.php';
-require './php-image-resize-master/lib/ImageResizeException.php';
-
 $title = '';
 $subtitle = '';
 $report = null;
 $category = '';
 $errors = [];
-
-// function uploadPath($fileName, $uploadFolder = 'uploads'){
-//     $currentFolder = dirname(__FILE__);
-//     $path = [$currentFolder, $uploadFolder, basename($fileName)];
-    
-//     return join(DIRECTORY_SEPARATOR, $path);
-// }
 
 function validFile($tempPath, $newPath){
     $validFileTypes = ['gif', 'jpg', 'jpeg', 'png'];
@@ -42,14 +31,6 @@ function validFile($tempPath, $newPath){
 
     return $isValidFileType && $isValidMimeType;
 }
-
-// Create uploads directory if it doesn't exist
-// $uploadsDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'uploads';
-// if (!is_dir($uploadsDir)) {
-//     if (!mkdir($uploadsDir, 0755, true)) {
-//         $errors['general'] = "Could not create uploads directory";
-//     }
-// }
 
 // Fetch categories
 try{
@@ -77,23 +58,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
 
     $imageId = null;
 
-    // handle image upload
-    // $uploadImage = isset($_FILES['image']) && ($_FILES['image']['error'] === 0);
-    // $uploadError = isset($_FILES['image']) && ($_FILES['image']['error'] > 0);
-    // $imageFileName = '';
-
     // checks if image is uploaded
     if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK){
         // filename sanitization
         $imageFileName = preg_replace('/[^a-zA-Z0-9._-]/', '',basename($_FILES['image']['name']));
         $tempImagePath = $_FILES['image']['tmp_name'];
-        // $newPath = uploadPath($imageFileName);
-        // $imageRelPath = 'uploads/' . $imageFileName;
 
         // Check file size (limit to 5MB)
         if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
             $errors['image'] = "File size too large. Maximum 5MB allowed.";
-        }elseif (!validFile($tempImagePath, $newPath)) {
+        }elseif (!validFile($tempImagePath, $imageFileName)) {
             $errors['image'] = "Invalid file type. Only GIF, PNG, JPG and JPEG files are allowed.";
         }
         // Check if file already exists and rename if necessary
@@ -101,26 +75,74 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
             // Generate unique filename to avoid conflicts 
             $fileExtension = pathinfo($imageFileName, PATHINFO_EXTENSION);
             $uniqueFileName = time() . '_' . mt_rand(1000, 9999) . '.' . $fileExtension;
-            // $newPath = uploadPath($uniqueFileName);
-            // $imageRelPath = 'uploads/' . $uniqueFileName;
 
-            // if(move_uploaded_file($tempImagePath, $newPath)){
-                try{
-                    // add image to database
-                    $imgStmt = $db->prepare("INSERT INTO images (image_name, image_path) VALUES (:name, :path)");
-                    $imgStmt->execute([':name'=> basename($newPath), ':path'=> $imageRelPath]);
-                    
-                    $imageId = $db->lastInsertId();
-                }catch(PDOException $e){
-                    $errors['image'] = "There was an error in saving the image: " . $e->getMessage();
-                    // Clean up uploaded file if database insert fails
-                    if (file_exists($newPath)) {
-                        unlink($newPath);
-                    }
-                } 
-            // }else{
-            //     $errors['image'] = "Failed to upload image. Check directory permissions.";
-            // }
+            try{
+                // get original image info
+                $imageInfo = getimagesize($tempImagePath);
+                $imageWidth = $imageInfo[0];
+                $imageHeight = $imageInfo[1];
+                $imageType = $imageInfo[2];
+                
+                // set max dimensions
+                $maxWidth = 800;
+                $maxHeight = 600;
+
+                // calculate new dimensions
+                $ratio = min($maxWidth/$imageWidth, $maxHeight/$imageHeight);
+                $newWidth = (int)($imageWidth * $ratio);
+                $newHeight = (int)($imageHeight * $ratio);
+
+                switch($imageType) {
+                    case IMAGETYPE_JPEG:
+                        $sourceImage = imagecreatefromjpeg($tempImagePath);
+                        break;
+                    case IMAGETYPE_PNG:
+                        $sourceImage = imagecreatefrompng($tempImagePath);
+                        break;
+                    case IMAGETYPE_GIF:
+                        $sourceImage = imagecreatefromgif($tempImagePath);
+                        break;
+                    default:
+                        throw new Exception("Your image is not supported. Sorry");
+                }
+
+                // create image with resized dimensions
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+
+                // resized image
+                imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $imageWidth, $imageHeight);
+
+                // capture resized image data
+                ob_start();
+                switch($imageType) {
+                    case IMAGETYPE_JPEG:
+                        imagejpeg($resizedImage, null, 85);
+                        break;
+                    case IMAGETYPE_PNG:
+                        imagepng($resizedImage);
+                        break;
+                    case IMAGETYPE_GIF:
+                        imagegif($resizedImage);
+                        break;
+                }
+                $resizedImageData = ob_get_contents();
+                ob_end_clean();
+
+                // clear memory
+                imagedestroy($sourceImage);
+                imagedestroy($resizedImage);
+
+                // save resized image to database
+                $imgStmt = $db->prepare("INSERT INTO images (image_name, image_data) VALUES (:name, :data)");
+                $imgStmt->execute([':name'=> basename($uniqueFileName), ':data'=> $resizedImageData]);
+
+                $imageId = $db->lastInsertId();
+
+            }catch(Exception $e){
+                $errors['image'] = "There was an error processing the image: " . $e->getMessage();
+            }catch(PDOException $e){
+                $errors['image'] = "There was an error saving the image: " . $e->getMessage();
+            } 
         }     
     }elseif(isset($_FILES['image']) && $_FILES['image']['error'] > 0 && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE){
         $errors['image'] = 'Error uploading file';
@@ -128,16 +150,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
     
     // proceed if there are no validation errors
     if(empty($errors) && !empty($title) && !empty($subtitle) && !empty($report)){
-        echo "<pre>ATTEMPTING DATABASE INSERT</pre>";
         $posts = $db->prepare("INSERT INTO posts(title, subtitle, report, category_id, creator_id, image_id) VALUES(:title, :subtitle, :report, :category, :creator, :image_id)");
-        // checks if there is an image or image error
-        if (!$uploadImage || isset($errors['image'])) {
-            $imageId = null;
-        }
+        $result = $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id'], ':image_id'=>$imageId]);
 
         try {
-            $result = $posts->execute([':title'=>$title, ':subtitle'=>$subtitle, ':report'=>$report, ':category'=>$category, ':creator'=>$_SESSION['user_id'], ':image_id'=>$imageId]);
-
             if($result){
                 header('Location: index.php');
                 exit();
@@ -147,8 +163,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
         }catch(PDOException $e){
             $errors['general'] = "Database error: " . $e->getMessage();
         }
-
-
     }
 }
 
