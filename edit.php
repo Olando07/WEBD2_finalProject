@@ -3,7 +3,7 @@ require_once 'sessionHandler.php';
 require_once 'connect.php';
 requireLogin(); // Make sure user is logged in
 
-$errors = ['title'=>'', 'subtitle'=>'', 'report'=>''];
+$errors = [];
 
 $stmt=$db->prepare("SELECT * FROM users WHERE username = :username");
 $stmt->execute([':username'=>$_SESSION['username']]);
@@ -77,7 +77,7 @@ if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'true'){
 if(isset($_POST['update'])){
     $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
     $subtitle = filter_input(INPUT_POST, 'subtitle', FILTER_UNSAFE_RAW);
-    $report = filter_input(INPUT_POST, 'report', FILTER_UNSAFE_RAW);
+    $report = filter_input(INPUT_POST, 'hidden-editor', FILTER_UNSAFE_RAW);
     $category = filter_input(INPUT_POST, 'category', FILTER_UNSAFE_RAW);
     
     // validate required fields
@@ -181,7 +181,6 @@ if(isset($_POST['update'])){
 
         try {
             if($result){
-    // TODO: find out why database updates but page does not reroute
                 header('Location: index.php');
                 exit();
             }else{
@@ -214,12 +213,12 @@ if(isset($_POST['update'])){
                     <div class="form-group">
                         <label for="title">Title:</label>
                         <input type="text" id="title" name="title" value="<?= htmlspecialchars($post['title'], ENT_QUOTES | ENT_HTML5)?>" required>
-                        <span class="error"><?= $errors['title']?></span>
+                        <span class="error"><?= isset($errors['title']) ? $errors['title'] : ''?></span>
                     </div>
                     <div class="form-group">
                         <label for="subtitle">Subtitle:</label>
                         <input type="text" id="subtitle" name="subtitle" value="<?= htmlspecialchars($post['subtitle'], ENT_QUOTES | ENT_HTML5)?>">
-                        <span class="error"><?= $errors['subtitle']?></span>
+                        <span class="error"><?= isset($errors['subtitle']) ? $errors['subtitle'] : ''?></span>
                     </div>
                     <div class="form-group">
                         <label for="category">Select a Category:</label>
@@ -227,9 +226,9 @@ if(isset($_POST['update'])){
                             <option value="" id="placeholder">
                                 Select a category
                             </option>
-                            <?php foreach($categories as $category): ?>
-                                <option value="<?= $category['category_id']?>" <?= $category['category_id'] == $post['category_id'] ? 'selected' : ''?>>
-                                    <?= $category['category_name']?>
+                            <?php foreach($categories as $cat): ?>
+                                <option value="<?= $cat['category_id']?>" <?= $cat['category_id'] == $post['category_id'] ? 'selected' : ''?>>
+                                    <?= $cat['category_name']?>
                                 </option>
                             <?php endforeach ?>
                         </select>
@@ -241,8 +240,10 @@ if(isset($_POST['update'])){
                         <span class="error"><?= isset($errors['image']) ? $errors['image']: ''?></span>
                     </div>
                     <div class="form-group">
-                        <label for="report">Content</label>
-                        <textarea name="report" id="report" rows="10" required><?= $post['report']?></textarea>
+                        <p>Report:</p>
+                        <div name="editor" id="editor" value="<?= isset($_POST['hidden-editor']) ? $_POST['hidden-editor'] : ''?>"></div>
+                        <input type="hidden" name="hidden-editor" id="hidden-editor" value="<?= isset($_POST['hidden-editor']) ? $_POST['hidden-editor'] : ''?>">
+                        <span class="error"><?= isset($errors['hidden-editor']) ? $errors['hidden-editor']: ''?></span>
                     </div>
 
                     <input type="hidden" name="confirm_delete" id="deleteFlag" value="">
@@ -269,10 +270,51 @@ if(isset($_POST['update'])){
             
             <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
             <script>
-                const quill = new Quill('#report-editor', {
-                    theme: 'snow',
-                    placeholder: 'Enter your report here'
-                });
+                document.addEventListener('DOMContentLoaded', function(){
+                    const toolbarOptions = [
+                        ['bold', 'italic', 'underline', 'strike'],  
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }], 
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],    
+                        ['clean']  
+                    
+                    ];
+                    const quill = new Quill('#editor', {
+                        placeholder: 'Enter your report here',
+                        theme: 'snow',
+                        modules: { toolbar: toolbarOptions }
+                    });
+                    
+                    let currentReport = '';
+                    let prevData = document.getElementById('hidden-editor').value;
+                    let postContent = <?= json_encode($post['report'] ?? '')?>
+                    // Load previosuly entered input
+                    if(prevData || prevData.trim() !== ''){
+                        quill.root.innerHTML = prevData;
+                    }else{
+                        quill.root.innerHTML = postContent;
+                        document.getElementById('hidden-editor').value = postContent;
+                    }
+
+                    // Update hidden input when changed 
+                    quill.on('text-change', function(){
+                        document.getElementById('hidden-editor').value = quill.root.innerHTML;
+                    });
+                    
+                    // handle input and form submission
+                    // retrieves user input and adds it to hidden input
+                    document.getElementById('editPostForm').addEventListener('submit', function(e){
+                        // update hidden input
+                        document.getElementById('hidden-editor').value = quill.root.innerHTML;
+
+                        // Check if there is content
+                        let textContent = quill.getText().trim();
+                        if(!textContent || textContent === 0){
+                            e.preventDefault();
+                            return false;
+                        }
+                    });
+                })
 
                 function showDeleteOverlay() {
                     document.getElementById('deleteOverlay').style.display = 'flex';

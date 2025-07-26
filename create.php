@@ -274,5 +274,44 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])){
             });
         })
     </script>
+            document.getElementById('createPostForm').addEventListener('submit', function(e){
+                // update hidden input
+                document.getElementById('hidden-editor').value = quill.root.innerHTML;
+
+                // Check if there is content
+                let textContent = quill.getText().trim();
+                if(!textContent || textContent === 0){
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        })
+    </script>
+            document.getElementById('createPostForm').addEventListener('submit', function(e){
+                // update hidden input
+                document.getElementById('hidden-editor').value = quill.root.innerHTML;
+
+                // Check if there is content
+                let textContent = quill.getText().trim();
+                if(!textContent || textContent === 0){
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        })
+    </script>
+            document.getElementById('createPostForm').addEventListener('submit', function(e){
+                // update hidden input
+                document.getElementById('hidden-editor').value = quill.root.innerHTML;
+
+                // Check if there is content
+                let textContent = quill.getText().trim();
+                if(!textContent || textContent === 0){
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        })
+    </script>
 
 </html>

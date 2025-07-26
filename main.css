@@ -444,8 +444,9 @@ html {
     flex-direction: column;
     align-items: center;
     height: 100dvh;
-    place-self: center;
+    width: 80dvw;
     margin-top: 80px;
+    place-self: center;
 }
 
 .comments-page .posts {
