@@ -30,26 +30,26 @@ $editBtn = null;
 if(!empty($selectedCategory)){
     if($_GET['search-bar']){
         // Both category filter and search 
-        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? AND p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_id FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? AND p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
         $posts=$stmt;
         $posts->execute([$selectedCategory, $searchPattern]); 
     }else{
         // Category filter only
-        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_id FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.category_id = ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $posts=$stmt;
         $posts->execute([$selectedCategory]);      
     }
 }else{
     if(isset($_GET['search-btn']) && $_GET['search-bar']){
         // Search only 
-        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_id FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
         $posts = $stmt;
         $posts->execute([$searchPattern]);
     }else{
         // No category filter or search
-        $posts=$db->query("SELECT p.*, c.category_name, i.image_name, i.image_data FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id ORDER BY p.time_created DESC, p.title, p.subtitle");
+        $posts=$db->query("SELECT p.*, c.category_name, i.image_id FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id ORDER BY p.time_created DESC, p.title, p.subtitle");
     }
 }   
 
@@ -112,28 +112,24 @@ if(!empty($selectedCategory)){
                             <p>
                                 <?= htmlspecialchars($row['subtitle'], ENT_QUOTES | ENT_HTML5)?>
                                 <?php 
-                                
                                     if($user['is_admin'] == 1){
                                         $editBtn = "<a href='edit.php?id=" . $row['post_id'] . "' class='edit-btn'>Edit post</a>";
                                     }
-        
                                 ?>
                                 <?= $editBtn?>
                             </p>
                         </h3>
 
-                        <?php if(!empty($row['image_id']) && !empty($row['image_path'])): ?>
-                            <?php
-                                 
-                            ?>                                   
-                            <img src="<?= $imagePath?>" alt="<?= $row['image_name']?>" class="thumbnail">
+                        <?php if(!empty($row['image_id'])): ?>                               
+                            <img src="serve_image.php?id=<?= $row['image_id']?>" alt="<?= $row['title']?>" class="thumbnail">
                         <?php endif ?>
 
                         <p><?= $row['report']?></p>
                         <div class="post-bottom">
                             <a href="fullpost.php?id=<?= $row['post_id']?>" class="fullpost">Read the full news post →</a>
-                            <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
                         </div>
+                        <p class="date"><?= date_format(new DateTime($row['time_created']), "F d Y h:i a") ?></p>
+                        <p class="date"><?= date_format(new DateTime($row['updated_at']), "F d Y h:i a") ?></p>
                         <!-- TODO: show date when post was last update -->
                     </div>
                 <?php endif?>
