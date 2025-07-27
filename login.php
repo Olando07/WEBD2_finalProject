@@ -2,9 +2,6 @@
 include_once 'sessionHandler.php';
 require_once('connect.php');
 
-// admin account pass: greatnesswithGod
-// regular account pass: itisnotclockingtoyou
-
 $userNameError = null;
 $passwordError = null;
 $loggedIn = null;

@@ -59,22 +59,52 @@ if(isset($_SESSION['user_id'])){
             <!-- Link to create page -->
             <?php if($isAdmin): ?>
                 <a href="create.php" id="createpost">Create</a>
+                <a href="admin_posts.php" id="manageposts">Manage Posts</a> 
             <?php endif ?>
 
             <a href="index.php" id="userInfo"><?= $displayUser?></a>
 
             <!-- Log out button -->
             <a href="index.php?action=logout" id="loginStatus" onclick="return confirm('Are you sure you want to logout?')">Log out</a>
+
+            <!-- Mode toggler -->
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
+                <img class="light-icon" src="./light_dark_icons/sun.svg" alt="Light mode" width="24" height="24">
+                <img class="dark-icon" src="./light_dark_icons/moon.svg" alt="Dark mode" width="24" height="24">
+            </button>
         </nav>
     </div>
 
     <!-- Javascript to handle category checkbox clearing -->
     <script>
-        window.addEventListener('load', function() {
-            if (performance.navigation.type === 1) { // 1 = reload
-                document.getElementById('search-bar').value = '';
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent form submission when toggle button is clicked
+                toggleTheme();
+            });
         });
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize theme on page load
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // Initialize theme when page loads
+        document.addEventListener('DOMContentLoaded', initTheme);
 
         // functionality to apply filter and keep previous input in search bar
         function applyFilter(){

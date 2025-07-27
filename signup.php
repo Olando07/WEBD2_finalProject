@@ -38,7 +38,7 @@ if($_POST && !empty($_POST['signup'])){
         $noError = false;
     }
     
-    if(empty($_POST['email']) || filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)){
+    if(empty($_POST['email']) || !filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)){
         $emailError = "Please enter your email.";
         $noError = false;
     }
@@ -73,7 +73,7 @@ if($_POST && !empty($_POST['signup'])){
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Check if user name or email is being used already
-    $duplicateCheck = $db->prepare("SELECT COUNT(*) FROM posts WHERE username = :username OR email = :email");
+    $duplicateCheck = $db->prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email");
     $duplicateCheck->execute([':username'=>$username, ':email'=>$email]);
 
     if($duplicateCheck->fetchColumn() > 0){

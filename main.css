@@ -2,7 +2,7 @@
    CSS CUSTOM PROPERTIES (VARIABLES)
    ======================================== */
 :root {
-    /* Color Palette */
+    /* Light Theme Colors */
     --primary-color: #255183;
     --primary-dark: #1a3b5c;
     --primary-light: #3d6ba3;
@@ -12,15 +12,24 @@
     
     --white: #ffffff;
     --black: #000000;
-    --text-dark: #333333;
-    --text-light: #666666;
+    --text-dark: #ffffff;  /* White text for contrast */
+    --text-light: #e0e0e0; /* Light gray for secondary text */
+    
+    /* Light theme background - soft blue */
+    --bg-primary: #e3f2fd;
+    --bg-secondary: #bbdefb;
+    
+    /* Dark elements for contrast */
+    --card-bg: #37474f;
+    --card-header: #263238;
+    --card-border: #455a64;
     
     --gray-100: #f8f9fa;
-    --gray-200: #e9ecef;
-    --gray-300: #dee2e6;
-    --gray-400: #ced4da;
-    --gray-500: #adb5bd;
-    --gray-600: #6c757d;
+    --gray-200: #546e7a;  /* Darker for contrast */
+    --gray-300: #455a64;  /* Darker for contrast */
+    --gray-400: #37474f;
+    --gray-500: #263238;
+    --gray-600: #1c2833;
     --gray-700: #495057;
     --gray-800: #343a40;
     --gray-900: #212529;
@@ -37,6 +46,7 @@
     --sidebar-width: 240px;
     --header-height: 100px;
     --border-radius: 8px;
+    --border-radius-small: 2px;
     --border-radius-large: 12px;
     --transition: all 0.3s ease;
     
@@ -56,6 +66,31 @@
     --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    /* Dark theme colors */
+    --text-dark: #ffffff;
+    --text-light: #b0b0b0;
+    
+    /* Dark theme backgrounds */
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    
+    /* Dark theme cards */
+    --card-bg: #21262d;
+    --card-header: #30363d;
+    --card-border: #30363d;
+    
+    --gray-200: #30363d;
+    --gray-300: #21262d;
+    --gray-400: #30363d;
+    --gray-500: #6e7681;
+    --gray-600: #8b949e;
+    
+    --white: #ffffff;
+    --black: #000000;
+}
+
 /* ========================================
    GLOBAL RESET & BASE STYLES
    ======================================== */
@@ -64,13 +99,13 @@
     padding: 0;
     box-sizing: border-box;
     text-decoration: none;
-    color: var(--black);
+    color: var(--text-dark);
     font-family: var(--font-family);
 }
 
 html {
     position: relative;
-    background-color: var(--primary-color);
+    background-color: var(--bg-primary);
     font-size: 16px;
     scroll-behavior: smooth;
 }
@@ -78,6 +113,59 @@ html {
 body {
     overflow-y: auto;
     overflow-x: hidden;
+    background-color: var(--bg-primary);
+    color: var(--text-dark);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    width: 42px;
+    height: 38px;
+    background-color: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 200px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.theme-toggle img {
+    width: 24px;
+    height: 24px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    filter: brightness(0) invert(1); /* Make icons white */
+}
+
+.theme-toggle .light-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle .dark-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}
+
+[data-theme="dark"] .theme-toggle .light-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
+[data-theme="dark"] .theme-toggle .dark-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
 }
 
 /* ========================================
@@ -91,24 +179,29 @@ body {
     min-height: 100vh;
 }
 
+.main {
+    background-color: var(--bg-primary);
+}
 /* Login/SignUp overlay */
 .main-overlay {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: var(--primary-color);
 }
 
 /* ========================================
    AUTHENTICATION PAGES (LOGIN/SIGNUP)
    ======================================== */
 .main-overlay .input {
-    background-color: rgba(22, 22, 22, 0.9);
+    background-color: var(--card-bg);
     backdrop-filter: blur(10px);
     min-width: 490px;
     min-height: 400px;
     border-radius: var(--border-radius-large);
     margin: 100px 0;
     box-shadow: var(--shadow-xl);
+    border: 1px solid var(--card-border);
 }
 
 .main-overlay .input form {
@@ -119,7 +212,7 @@ body {
     font-size: var(--font-size-xxl);
     text-align: center;
     margin: 30px 0 35px;
-    color: var(--white);
+    color: var(--text-dark);
     font-weight: 300;
 }
 
@@ -136,7 +229,7 @@ body {
 .main-overlay .input form .input-div .input-fields label {
     margin: 8px 0;
     font-size: var(--font-size-lg);
-    color: var(--white);
+    color: var(--text-dark);
     font-weight: 500;
 }
 
@@ -147,15 +240,17 @@ body {
     padding: 12px 16px;
     font-size: var(--font-size-md);
     border-radius: var(--border-radius);
-    border: none;
+    border: 1px solid var(--card-border);
     outline: none;
-    color: var(--text-dark);
+    background-color: var(--bg-secondary);
+    color: var(--black);
     transition: var(--transition);
 }
 
 .main-overlay .input form .input-div .input-fields input:focus,
 .main-overlay .input form .input-div .input-fields textarea:focus {
     box-shadow: 0 0 0 3px rgba(37, 81, 131, 0.3);
+    border-color: var(--primary-color);
 }
 
 /* Error and Success Messages */
@@ -184,7 +279,7 @@ body {
 .main-overlay .input form .input-div .input-fields #newUser {
     font-size: var(--font-size-sm);
     text-decoration: underline;
-    color: var(--white);
+    color: var(--text-dark);
     text-align: center;
     display: block;
     margin-top: 10px;
@@ -204,14 +299,15 @@ body {
     margin: 10px 0;
 }
 
-.password-div input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+.main-overlay .input form .input-div .input-fields input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
     cursor: pointer;
+    margin-left: 4px;
 }
 
 .password-div p {
-    color: var(--white);
+    color: var(--text-dark);
     font-size: var(--font-size-md);
     margin: 0;
     cursor: pointer;
@@ -227,14 +323,14 @@ body {
 
 .main-overlay .input form .input-div .input-btns input,
 .main-overlay .input form .input-div .input-btns a {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
     border-radius: var(--border-radius);
     cursor: pointer;
-    color: var(--white);
-    border: 2px solid var(--white);
-    background-color: rgba(22, 22, 22, 0.8);
+    color: var(--black);
+    border: 2px solid var(--card-border);
+    background-color: var(--bg-secondary);
     width: 120px;
-    height: 44px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -253,12 +349,13 @@ body {
 /* Select elements */
 .main-overlay .input form .input-div select {
     color: var(--text-dark);
+    background-color: var(--bg-secondary);
     height: 44px;
     width: 100%;
     max-width: 400px;
     font-size: var(--font-size-sm);
     border-radius: var(--border-radius);
-    border: none;
+    border: 1px solid var(--card-border);
     outline: none;
     padding: 0 12px;
     cursor: pointer;
@@ -306,7 +403,8 @@ body {
 /* Search Bar */
 .nav-bar nav .search-div,
 .main .nav-bar nav .search-div {
-    background: var(--gray-200);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 40px;
     width: 100%;
     max-width: 500px;
@@ -329,7 +427,7 @@ body {
 
 .nav-bar nav .search-div #search-bar::placeholder,
 .main .nav-bar nav .search-div #search-bar::placeholder {
-    color: var(--gray-600);
+    color: var(--text-light);
 }
 
 .nav-bar nav .search-div #search-btn,
@@ -346,9 +444,8 @@ body {
 
 .nav-bar nav .search-div #search-btn:hover,
 .main .nav-bar nav .search-div #search-btn:hover {
-    color: var(--white);
-    text-shadow: 2px 0px 2px var(--accent-color), -2px 0px 2px var(--accent-color), 
-                 0px 2px 2px var(--accent-color), 0px -2px 2px var(--accent-color);
+    color: var(--accent-color);
+    text-shadow: 0 0 8px var(--accent-color);
 }
 
 /* Navigation Links */
@@ -356,8 +453,8 @@ body {
 .main .nav-bar nav a {
     padding: 6px 16px;
     color: var(--text-dark);
-    background-color: var(--gray-300);
-    border: 2px solid var(--black);
+    background-color: var(--card-bg);
+    border: 2px solid var(--card-border);
     border-radius: var(--border-radius);
     font-size: var(--font-size-sm);
     font-weight: 500;
@@ -367,10 +464,10 @@ body {
 
 .nav-bar nav a:hover,
 .main .nav-bar nav a:hover {
-    color: var(--white);
-    text-shadow: 2px 0px 2px var(--accent-color), -2px 0px 2px var(--accent-color), 
-                 0px 2px 2px var(--accent-color), 0px -2px 2px var(--accent-color);
+    color: var(--accent-color);
+    text-shadow: 0 0 8px var(--accent-color);
     transform: translateY(-2px);
+    border-color: var(--primary-color);
 }
 
 .main .nav-bar nav #homepage {
@@ -379,8 +476,8 @@ body {
 
 .nav-bar nav #loginStatus,
 .main .nav-bar nav #loginStatus {
-    background-color: var(--gray-300);
-    border: 2px solid var(--black);
+    background-color: var(--card-bg);
+    border: 2px solid var(--card-border);
     border-radius: var(--border-radius);
 }
 
@@ -394,9 +491,9 @@ body {
     left: 0;
     top: 0;
     padding: 20px 15px;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    color: var(--white);
+    background-color: var(--card-bg);
+    border-right: 1px solid var(--card-border);
+    color: var(--text-dark);
     overflow-y: auto;
     z-index: 999;
 }
@@ -407,7 +504,7 @@ body {
 }
 
 .main .category-list .category-filters h3 {
-    color: var(--white);
+    color: var(--text-dark);
     margin: 45px 0 50px 15px;
     font-size: var(--font-size-lg);
 }
@@ -418,7 +515,8 @@ body {
     width: 180px;
     padding: 8px 12px;
     border-radius: var(--border-radius);
-    border: none;
+    border: 1px solid var(--card-border);
+    background-color: var(--primary-color);
     outline: none;
     cursor: pointer;
     color: var(--text-dark);
@@ -438,7 +536,7 @@ body {
     width: 140px;
     align-self: center;
     cursor: pointer;
-    border: 2px solid var(--white);
+    border: 2px solid var(--card-border);
     background-color: var(--primary-color);
     color: var(--white);
     font-weight: 500;
@@ -446,9 +544,8 @@ body {
 }
 
 .main .category-list .category-filters .form-actions input:hover {
-    color: var(--white);
-    text-shadow: 2px 0px 2px var(--accent-color), -2px 0px 2px var(--accent-color), 
-                 0px 2px 2px var(--accent-color), 0px -2px 2px var(--accent-color);
+    color: var(--accent-color);
+    text-shadow: 0 0 8px var(--accent-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -463,12 +560,12 @@ body {
 
 .main .news-posts .posts,
 .comments-page .posts {
-    background-color: var(--white);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
     margin: 0 0 30px;
     height: fit-content;
     min-width: 280px;
     max-width: 680px;
-    border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
     break-inside: avoid;
     transition: var(--transition);
@@ -476,19 +573,23 @@ body {
     flex-direction: column;
 }
 
+.main .news-posts .posts {
+    border-radius: var(--border-radius);
+}
+
+.comments-page .posts {
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+
 .main .news-posts .posts:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
 }
 
-.comments-page .posts {
-    margin: 0 0 30px;
-    max-width: 800px;
-}
-
 .main .news-posts .posts .title {
     padding: 20px 25px 15px;
-    background: var(--gray-200);
+    background: var(--card-header);
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
@@ -497,6 +598,7 @@ body {
     font-weight: bold;
     margin-bottom: 8px;
     line-height: 1.3;
+    color: var(--text-dark);
 }
 
 .main .news-posts .posts .title p {
@@ -533,10 +635,10 @@ body {
 
 .comments-page .fullsize {
     width: 100%;
-    max-height: 400px;
+    max-height: 700px;
     object-fit: cover;
     border-radius: var(--border-radius);
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     box-shadow: var(--shadow-lg);
 }
 
@@ -550,7 +652,7 @@ body {
 }
 
 .main .news-posts .posts .post-bottom {
-    background: var(--gray-200);
+    background: var(--card-header);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -560,14 +662,14 @@ body {
 }
 
 .main .news-posts .posts .fullpost {
-    color: var(--primary-color);
+    color: var(--primary-light);
     font-weight: 500;
     font-size: var(--font-size-sm);
     transition: var(--transition);
 }
 
 .main .news-posts .posts .fullpost:hover {
-    color: var(--primary-dark);
+    color: var(--secondary-color);
     text-decoration: underline;
 }
 
@@ -596,11 +698,14 @@ body {
     max-width: 1000px;
     margin: 80px auto 0;
     padding: 2rem;
+    background-color: var(--bg-primary);
 }
 
 .comments-page .posts {
     padding: 30px;
+    margin: 0;
     width: 100%;
+    max-width: 100%;
 }
 
 .comments-page .posts h3 {
@@ -620,11 +725,11 @@ body {
 }
 
 .comments-page .comments-overlay {
-    background-color: var(--gray-800);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
     width: 100%;
-    max-width: 750px;
-    margin: 50px 0;
-    border-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
     overflow: hidden;
 }
@@ -635,8 +740,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--gray-600);
-    color: var(--white);
+    background-color: var(--card-header);
+    color: var(--text-dark);
     font-size: var(--font-size-lg);
 }
 
@@ -649,10 +754,12 @@ body {
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
+    background-color: var(--bg-primary);
 }
 
 .edit-main .edit-form, .create-main .create-form {
-    background-color: var(--white);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 40px;
     border-radius: var(--border-radius-large);
     width: 100%;
@@ -693,7 +800,9 @@ body {
 .create-main .create-form form .form-group input {
     font-size: var(--font-size-md);
     padding: 12px 16px;
-    border: 2px solid var(--gray-300);
+    border: 2px solid var(--card-border);
+    background-color: var(--bg-secondary);
+    color: var(--text-dark);
     border-radius: var(--border-radius);
     transition: var(--transition);
 }
@@ -707,8 +816,9 @@ body {
 .edit-main .edit-form form .form-group select,
 .create-main .create-form form .form-group select {
     font-size: var(--font-size-sm);
-    /* padding: 12px 16px; */
-    border: 2px solid var(--gray-300);
+    border: 2px solid var(--card-border);
+    background-color: var(--bg-secondary);
+    color: var(--text-dark);
     border-radius: var(--border-radius);
     cursor: pointer;
     max-width: 300px;
@@ -718,13 +828,17 @@ body {
 .edit-main .edit-form form .form-group select option,
 .create-main .create-form form .form-group select option {
     padding: 8px 12px;
+    background-color: var(--bg-secondary);
+    color: var(--text-dark);
 }
 
 .edit-main .edit-form form .form-group textarea,
 .create-main .create-form form .form-group textarea {
     padding: 15px;
     font-size: var(--font-size-sm);
-    border: 2px solid var(--gray-300);
+    border: 2px solid var(--card-border);
+    background-color: var(--bg-secondary);
+    color: var(--text-dark);
     border-radius: var(--border-radius);
     min-height: 150px;
     resize: vertical;
@@ -740,9 +854,10 @@ body {
 .create-main .create-form form .image-upload input,
 .edit-main .edit-form form .image-upload input {
     padding: 12px;
-    border: 2px dashed var(--gray-400);
+    border: 2px dashed var(--card-border);
     border-radius: var(--border-radius);
-    background-color: var(--gray-100);
+    background-color: var(--bg-secondary);
+    color: var(--text-dark);
     cursor: pointer;
     transition: var(--transition);
 }
@@ -750,7 +865,7 @@ body {
 .create-main .create-form form .image-upload input:hover,
 .edit-main .edit-form form .image-upload input:hover {
     border-color: var(--primary-color);
-    background-color: var(--gray-200);
+    background-color: var(--card-bg);
 }
 
 .create-main .create-form form .image-upload small,
@@ -765,7 +880,8 @@ body {
 .create-main .create-form form .form-group #editor,
 .edit-main .edit-form form .form-group #editor {
     min-height: 200px;
-    border: 2px solid var(--gray-300);
+    border: 2px solid var(--card-border);
+    background-color: var(--bg-secondary);
     border-radius: var(--border-radius);
 }
 
@@ -790,7 +906,7 @@ body {
     justify-content: center;
     align-items: center;
     gap: 30px;
-    border-top: 1px solid var(--gray-300);
+    border-top: 1px solid var(--card-border);
     margin-top: 30px;
 }
 
@@ -819,7 +935,7 @@ body {
 
 .cancel-btn {
     background-color: var(--info-light);
-    border-color: var(--text-dark);
+    border-color: var(--card-border);
 }
 
 .update-btn:hover,
@@ -848,7 +964,8 @@ body {
 }
 
 .delete-modal {
-    background-color: var(--white);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 40px;
     border-radius: var(--border-radius-large);
     box-shadow: var(--shadow-xl);
@@ -878,7 +995,7 @@ body {
 
 .btn {
     padding: 10px 20px;
-    border: 2px solid var(--black);
+    border: 2px solid var(--card-border);
     border-radius: var(--border-radius);
     font-weight: bold;
     cursor: pointer;
@@ -1071,9 +1188,13 @@ a:focus {
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     :root {
-        --gray-300: #cccccc;
-        --gray-600: #444444;
-        --text-light: #222222;
+        --card-border: #666666;
+        --text-light: #cccccc;
+    }
+    
+    [data-theme="dark"] {
+        --card-border: #888888;
+        --text-light: #dddddd;
     }
 }
 
@@ -1087,7 +1208,8 @@ a:focus {
     .edit-main .edit-form form .form-actions,
     .create-main .create-form form .form-actions,
     .delete-overlay,
-    .edit-btn {
+    .edit-btn,
+    .theme-toggle {
         display: none !important;
     }
     
@@ -1099,7 +1221,7 @@ a:focus {
     .main .news-posts .posts,
     .comments-page .posts {
         box-shadow: none !important;
-        border: 1px solid var(--gray-400);
+        border: 1px solid #ccc;
         break-inside: avoid;
         margin-bottom: 20px;
     }
@@ -1109,8 +1231,13 @@ a:focus {
     }
     
     body {
-        background-color: var(--white) !important;
-        color: var(--black) !important;
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    * {
+        color: black !important;
+        background-color: white !important;
     }
 }
 
