@@ -120,10 +120,11 @@ if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == 'true'){
         </table>
     </div>
                 
-            <form method="POST" id="deleteForm" enctype="multipart/form-data">
-                <input type="hidden" name="confirm_delete" value="true">
-                <input type="hidden" name="post_id" id="postIdToDelete">
-            </form>
+    <!-- hidden form to submit post id of form to delete -->
+    <form method="POST" id="deleteForm" enctype="multipart/form-data">
+        <input type="hidden" name="confirm_delete" value="true">
+        <input type="hidden" name="post_id" id="postIdToDelete">
+    </form>
             
     <!-- Delete Confirmation Overlay -->
     <div class="delete-overlay" id="deleteOverlay">

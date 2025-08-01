@@ -443,7 +443,7 @@ body {
 }
 
 .nav-bar nav .search-div #search-btn:hover,
-.main .nav-bar nav .search-div #search-btn:hover {
+.main .nav-bar nav .search-div #search-btn:hover, #postComment:hover {
     color: var(--accent-color);
     text-shadow: 0 0 8px var(--accent-color);
 }
@@ -463,7 +463,7 @@ body {
 }
 
 .nav-bar nav a:hover,
-.main .nav-bar nav a:hover {
+.main .nav-bar nav a:hover, #postComment:hover {
     color: var(--accent-color);
     text-shadow: 0 0 8px var(--accent-color);
     transform: translateY(-2px);
@@ -578,8 +578,8 @@ body {
 }
 
 .comments-page .posts {
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
 }
 
 .main .news-posts .posts:hover {
@@ -637,8 +637,8 @@ body {
     width: 100%;
     max-height: 700px;
     object-fit: cover;
-    border-radius: var(--border-radius);
-    margin-bottom: 1rem;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
 }
 
@@ -725,14 +725,41 @@ body {
     margin: 0;
 }
 
+.comments-page .comments-overlay #newComment {
+    min-width: 95%;
+    max-width: 95%;
+    margin: 40px 20px 20px 20px;
+    background-color: var(--card-header);
+    padding: 12px 10px;
+    font-size: var(--font-size-md);
+    height: 140px;
+}
+
+.comments-page .comments-overlay #postComment {
+    float: right;
+    margin-right: 28px;
+    padding: 6px 30px;
+    font-size: var(--font-size-md);
+    background-color: var(--gray-600);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+.comments-page .comments-overlay .comments-main {
+    padding: 20px;
+}
+
 .comments-page .comments-overlay {
+    display: flex;
+    flex-direction: column;
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     width: 100%;
-    border-bottom-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
     overflow: hidden;
+    margin-top: 50px; 
 }
 
 .comments-page .comments-heading h2 {
@@ -744,6 +771,45 @@ body {
     background-color: var(--card-header);
     color: var(--text-dark);
     font-size: var(--font-size-lg);
+}
+
+.comments-overlay .error-message {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.comments-overlay .success-message {
+    background-color: #efe;
+    border: 1px solid #cfc;
+    color: #363;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.all-comments {
+    width: 100%;
+    background-color: var(--card-bg);
+}
+
+.all-comments .comment {
+    padding: 18px 45px;
+    border-bottom: 2px solid #000000;
+}
+
+.all-comments .comment-header {
+    margin: 10px 0;
+}
+
+.all-comments .no-comments {
+  display: flex;
+  justify-content: center;
+  margin: 70px 0;
+  font-size: var(--font-size-lg);
 }
 
 /* ========================================
