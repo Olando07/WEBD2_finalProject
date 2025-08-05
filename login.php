@@ -34,9 +34,7 @@ if($_POST && !empty($_POST['login'])){
         
         if(!$user){
             $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
-        }
-        
-        if(!password_verify($password, $user['password'])){
+        }elseif(!password_verify($password, $user['password'])){
             $invalidCredentials = "<p id='failed-login'>Failed login. Check your login info</p>";
         }
     }

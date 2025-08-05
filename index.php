@@ -41,7 +41,7 @@ if(!empty($selectedCategory)){
         $posts->execute([$selectedCategory]);      
     }
 }else{
-    if(isset($_GET['search-btn']) && $_GET['search-bar']){
+    if(!empty($_GET['search-bar']) && $_GET['search-bar']){
         // Search only 
         $stmt = $db->prepare("SELECT p.*, c.category_name, i.image_id FROM posts p LEFT JOIN categories c ON p.category_id = c.category_id LEFT JOIN images i ON p.image_id = i.image_id WHERE p.title LIKE ? ORDER BY p.time_created DESC, p.title, p.subtitle");
         $searchPattern = '%' . $userSearch . '%';
@@ -71,7 +71,7 @@ if(!empty($selectedCategory)){
 
                     <!-- Categories users can select -->
                      <select name="category" id="category">
-                        <option value="placeholder" id="placeholder">
+                        <option value="" id="placeholder">
                             Select a category
                         </option>
                          <?php foreach($categories as $category): ?>
@@ -138,5 +138,27 @@ if(!empty($selectedCategory)){
             <?php endwhile?>
         </div>
     </div>
+
+    <script>
+        // functionality to apply filter and keep previous input in search bar
+        function applyFilter(){
+            const searchValue = document.getElementById('search-bar');
+
+            let hiddenValue = document.createElement('input');
+            hiddenValue.type = hidden;
+            hiddenValue.name = 'search-btn';
+            hiddenValue.value = searchValue;
+
+            document.querySelector('form').appendChild(hiddenValue);
+            document.querySelector('form').submit();
+        }
+
+        function clearAll(){
+            let category = document.getElementById('category');
+            category.value = '';
+
+            document.querySelector('form').submit();
+        }
+    </script>
 </body>
 </html>

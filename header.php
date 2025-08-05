@@ -37,6 +37,7 @@ if(isset($_SESSION['user_id'])){
     }
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -50,8 +51,10 @@ if(isset($_SESSION['user_id'])){
     <div class='nav-bar'>
         <nav>
             <div class="search-div">
-                <input type="text" placeholder="Search" value="<?= htmlspecialchars($userSearch)?>" id="search-bar" name="search-bar">
-                <input type="submit" value="Search" id="search-btn" name="search-btn">
+                <form action="index.php" method="GET">
+                    <input type="text" placeholder="Search" value="<?= htmlspecialchars($userSearch)?>" id="search-bar" name="search-bar">
+                    <input type="submit" value="Search" id="search-btn" name="search-btn">
+                </form>
             </div>
             <!-- Link to home page -->
             <a href="index.php" id="homepage">Home</a>
